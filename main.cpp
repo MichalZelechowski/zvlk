@@ -35,6 +35,8 @@ private:
     }
 
     void cleanup() {
+        vkDestroyInstance(instance, nullptr);
+
         glfwDestroyWindow(window);
 
         glfwTerminate();
@@ -58,8 +60,8 @@ private:
 
         glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-        std::cout << "glfw extension: "<< std::endl;
-        for (int i=0; i< glfwExtensionCount; ++i) {
+        std::cout << "glfw extension: " << std::endl;
+        for (int i = 0; i < glfwExtensionCount; ++i) {
             std::cout << glfwExtensions[i] << std::endl;
         }
         createInfo.enabledExtensionCount = glfwExtensionCount;
