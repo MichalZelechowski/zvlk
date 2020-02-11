@@ -27,6 +27,7 @@
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
+    <itemPath>compile.bash</itemPath>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -44,6 +45,8 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="compile.bash" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="shader.frag" ex="false" tool="3" flavor2="0">
@@ -72,6 +75,8 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="compile.bash" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="shader.frag" ex="false" tool="3" flavor2="0">
