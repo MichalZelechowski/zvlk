@@ -72,7 +72,10 @@
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
-          <standard>8</standard>
+          <standard>12</standard>
+          <incDir>
+            <pElem>include</pElem>
+          </incDir>
         </ccTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>
@@ -80,6 +83,36 @@
         <asmTool>
           <developmentMode>5</developmentMode>
         </asmTool>
+      </compileType>
+      <item path="compile.bash" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="shader.frag" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shader.vert" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release_new" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <developmentMode>6</developmentMode>
+          <standard>12</standard>
+          <incDir>
+            <pElem>include</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerOptionItem>`pkg-config --libs vulkan`</linkerOptionItem>
+            <linkerOptionItem>`pkg-config --libs glfw3`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
       </compileType>
       <item path="compile.bash" ex="false" tool="3" flavor2="0">
       </item>
