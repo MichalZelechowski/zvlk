@@ -1237,8 +1237,8 @@ private:
         multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
         multisampling.sampleShadingEnable = VK_FALSE;
         multisampling.rasterizationSamples = msaaSamples;
-        //multisampling.sampleShadingEnable = VK_TRUE; // enable sample shading in the pipeline
-        //multisampling.minSampleShading = .2f;
+        multisampling.sampleShadingEnable = VK_TRUE; // enable sample shading in the pipeline
+        multisampling.minSampleShading = .2f;
         multisampling.minSampleShading = 1.0f; // Optional
         multisampling.pSampleMask = nullptr; // Optional
         multisampling.alphaToCoverageEnable = VK_FALSE; // Optional
@@ -1446,7 +1446,7 @@ private:
 
         VkPhysicalDeviceFeatures deviceFeatures = {};
         deviceFeatures.samplerAnisotropy = VK_TRUE;
-        //deviceFeatures.sampleRateShading = VK_TRUE;
+        deviceFeatures.sampleRateShading = VK_TRUE;
 
         VkDeviceCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -1514,6 +1514,7 @@ private:
         vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
         cout << deviceProperties.deviceName << ' ' << deviceProperties.deviceType << ' ' << deviceProperties.driverVersion << endl;
         cout << deviceFeatures.shaderFloat64 << endl;
+        cout << "Sample rate shading" << deviceFeatures.sampleRateShading << endl;
 
         int score = 0;
 
