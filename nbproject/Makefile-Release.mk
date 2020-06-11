@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/Device.o \
 	${OBJECTDIR}/Vulkan.o \
 	${OBJECTDIR}/Window.o \
 	${OBJECTDIR}/WindowCallback.o \
@@ -64,6 +65,11 @@ LDLIBSOPTIONS=
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/vulkanstarter: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/vulkanstarter ${OBJECTFILES} ${LDLIBSOPTIONS}
+
+${OBJECTDIR}/Device.o: Device.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -Iinclude -std=c++17 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Device.o Device.cpp
 
 ${OBJECTDIR}/Vulkan.o: Vulkan.cpp
 	${MKDIR} -p ${OBJECTDIR}

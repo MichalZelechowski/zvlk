@@ -18,8 +18,10 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "Window.h"
+#include "Device.h"
 
 namespace zvlk {
 
@@ -36,6 +38,7 @@ namespace zvlk {
         VkInstance instance;
     private:
 
+        std::vector<std::unique_ptr<Device>> devices;
         bool debug;
         VkDebugUtilsMessengerEXT debugMessenger;
 

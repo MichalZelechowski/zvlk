@@ -54,6 +54,15 @@ namespace zvlk {
         if (debug && this->createDebugUtilsMessenger(const_cast<VkDebugUtilsMessengerCreateInfoEXT*> (&debugCreateInfo)) != VK_SUCCESS) {
             throw std::runtime_error("failed to set up debug messenger!");
         }
+
+        uint32_t deviceCount = 0;
+        vkEnumeratePhysicalDevices(this->instance, &deviceCount, nullptr);
+        this->devices.resize(deviceCount);
+        std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
+        vkEnumeratePhysicalDevices(this->instance, &deviceCount, physicalDevices.data());
+        for (VkPhysicalDevice pD : physicalDevices) {
+            this->devices.push_back(std::unique_ptr<Device>(new Device(pD)));
+        }
     }
 
     Vulkan::~Vulkan() {

@@ -4,6 +4,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>include/Device.h</itemPath>
       <itemPath>include/Vulkan.h</itemPath>
       <itemPath>include/Window.h</itemPath>
       <itemPath>include/WindowCallback.h</itemPath>
@@ -15,6 +16,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>Device.cpp</itemPath>
       <itemPath>Vulkan.cpp</itemPath>
       <itemPath>Window.cpp</itemPath>
       <itemPath>WindowCallback.cpp</itemPath>
@@ -57,6 +59,8 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="Device.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="Vulkan.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Window.cpp" ex="false" tool="1" flavor2="0">
@@ -64,6 +68,8 @@
       <item path="WindowCallback.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="compile.bash" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Device.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/Vulkan.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -102,6 +108,8 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="Device.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="Vulkan.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Window.cpp" ex="false" tool="1" flavor2="0">
@@ -109,6 +117,8 @@
       <item path="WindowCallback.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="compile.bash" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Device.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/Vulkan.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -144,6 +154,8 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="Device.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="Vulkan.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Window.cpp" ex="false" tool="1" flavor2="0">
@@ -151,6 +163,8 @@
       <item path="WindowCallback.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="compile.bash" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Device.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/Vulkan.h" ex="false" tool="3" flavor2="0">
       </item>
