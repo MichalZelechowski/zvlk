@@ -35,6 +35,9 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/Vulkan.o \
+	${OBJECTDIR}/Window.o \
+	${OBJECTDIR}/WindowCallback.o \
 	${OBJECTDIR}/main.o
 
 
@@ -61,6 +64,21 @@ LDLIBSOPTIONS=
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/vulkanstarter: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/vulkanstarter ${OBJECTFILES} ${LDLIBSOPTIONS}
+
+${OBJECTDIR}/Vulkan.o: Vulkan.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -Iinclude -std=c++17 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Vulkan.o Vulkan.cpp
+
+${OBJECTDIR}/Window.o: Window.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -Iinclude -std=c++17 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Window.o Window.cpp
+
+${OBJECTDIR}/WindowCallback.o: WindowCallback.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -Iinclude -std=c++17 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/WindowCallback.o WindowCallback.cpp
 
 ${OBJECTDIR}/main.o: main.cpp
 	${MKDIR} -p ${OBJECTDIR}

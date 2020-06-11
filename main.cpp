@@ -3,7 +3,10 @@
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <iostream>
@@ -27,6 +30,11 @@
 #include <stb_image.h>
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
+
+#include "Window.h"
+#include "WindowCallback.h"
+#include "Vulkan.h"
+
 using namespace std;
 
 const int WIDTH = 800;
@@ -53,10 +61,7 @@ static std::vector<char> readFile(const string& filename) {
     return buffer;
 }
 
-const vector<const char*> validationLayers = {
-    //    "VK_LAYER_KHRONOS_validation"
-    "VK_LAYER_LUNARG_standard_validation"
-};
+
 
 const vector<const char*> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -73,22 +78,6 @@ struct UniformBufferObject {
     glm::mat4 view;
     glm::mat4 proj;
 };
-
-VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-    if (func != nullptr) {
-        return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-    } else {
-        return VK_ERROR_EXTENSION_NOT_PRESENT;
-    }
-}
-
-void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-    if (func != nullptr) {
-        func(instance, debugMessenger, pAllocator);
-    }
-}
 
 struct QueueFamilyIndices {
     uint32_t graphicsFamily;
@@ -186,24 +175,23 @@ const bool enableValidationLayers = true;
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
-class HelloTriangleApplication {
+class HelloTriangleApplication : public zvlk::WindowCallback {
 public:
 
     void run() {
-        initWindow();
+        this->window = new zvlk::Window(WIDTH, HEIGHT, std::string("Vulkan"), dynamic_cast<WindowCallback*> (this));
+
         initVulkan();
         mainLoop();
         cleanup();
     }
 
 private:
-    GLFWwindow *window;
-    VkInstance instance;
-    VkDebugUtilsMessengerEXT debugMessenger;
+    zvlk::Window *window;
+    zvlk::Vulkan *vulkan;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkDevice device;
     VkQueue graphicsQueue;
-    VkSurfaceKHR surface;
     VkQueue presentQueue;
     VkSwapchainKHR swapChain;
     vector<VkImage> swapChainImages;
@@ -247,11 +235,8 @@ private:
     VkImageView colorImageView;
 
     void initVulkan() {
-        createInstance();
-
-        setupDebugMessenger();
-
-        createSurface();
+        this->vulkan = new zvlk::Vulkan(enableValidationLayers, std::string("Triangel app"));
+        this->vulkan->addSurface(this->window);
 
         pickPhysicalDevice();
 
@@ -493,8 +478,8 @@ private:
     void createColorResources() {
         VkFormat colorFormat = swapChainImageFormat;
 
-        createImage(swapChainExtent.width, swapChainExtent.height, 1, msaaSamples, 
-                colorFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, 
+        createImage(swapChainExtent.width, swapChainExtent.height, 1, msaaSamples,
+                colorFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, colorImage, colorImageMemory);
         colorImageView = createImageView(colorImage, colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1);
     }
@@ -917,11 +902,7 @@ private:
     }
 
     void recreateSwapChain() {
-        int width = 0, height = 0;
-        while (width == 0 || height == 0) {
-            glfwGetFramebufferSize(window, &width, &height);
-            glfwWaitEvents();
-        }
+        this->window->waitResize();
 
         vkDeviceWaitIdle(device);
 
@@ -965,7 +946,7 @@ private:
     }
 
     void createCommandPool() {
-        QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice, surface);
+        QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice, this->vulkan->surface);
 
         VkCommandPoolCreateInfo poolInfo = {};
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -1357,7 +1338,7 @@ private:
 
         VkSwapchainCreateInfoKHR createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-        createInfo.surface = surface;
+        createInfo.surface = this->vulkan->surface;
         createInfo.oldSwapchain = swapChain;
 
         createInfo.minImageCount = imageCount;
@@ -1367,7 +1348,7 @@ private:
         createInfo.imageArrayLayers = 1;
         createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-        QueueFamilyIndices indices = findQueueFamilies(physicalDevice, surface);
+        QueueFamilyIndices indices = findQueueFamilies(physicalDevice, this->vulkan->surface);
         uint32_t queueFamilyIndices[] = {indices.graphicsFamily, indices.presentFamily};
 
         if (indices.graphicsFamily != indices.presentFamily) { //if ownership has to be transferred between  queues (for multiple queues)
@@ -1398,38 +1379,32 @@ private:
         this->swapChainImageFormat = surfaceFormat.format;
     }
 
-    void createSurface() {
-        if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
-            throw runtime_error("failed to create window surface!");
-        }
-    }
-
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) {
         SwapChainSupportDetails details;
 
-        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, this->vulkan->surface, &details.capabilities);
 
         uint32_t formatCount;
-        vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(device, this->vulkan->surface, &formatCount, nullptr);
 
         if (formatCount != 0) {
             details.formats.resize(formatCount);
-            vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
+            vkGetPhysicalDeviceSurfaceFormatsKHR(device, this->vulkan->surface, &formatCount, details.formats.data());
         }
 
         uint32_t presentModeCount;
-        vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(device, this->vulkan->surface, &presentModeCount, nullptr);
 
         if (presentModeCount != 0) {
             details.presentModes.resize(presentModeCount);
-            vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
+            vkGetPhysicalDeviceSurfacePresentModesKHR(device, this->vulkan->surface, &presentModeCount, details.presentModes.data());
         }
 
         return details;
     }
 
     void createLogicalDevice() {
-        QueueFamilyIndices indices = findQueueFamilies(physicalDevice, surface);
+        QueueFamilyIndices indices = findQueueFamilies(physicalDevice, this->vulkan->surface);
 
         vector<VkDeviceQueueCreateInfo> queueCreateInfos;
         set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily, indices.presentFamily};
@@ -1459,9 +1434,9 @@ private:
         createInfo.enabledExtensionCount = static_cast<uint32_t> (deviceExtensions.size());
         createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
-        if (enableValidationLayers) {
-            createInfo.enabledLayerCount = static_cast<uint32_t> (validationLayers.size());
-            createInfo.ppEnabledLayerNames = validationLayers.data();
+        if (enableValidationLayers) { // TODO!!!
+            //createInfo.enabledLayerCount = static_cast<uint32_t> (validationLayers.size());
+            //createInfo.ppEnabledLayerNames = validationLayers.data();
         } else {
             createInfo.enabledLayerCount = 0;
         }
@@ -1477,14 +1452,14 @@ private:
 
     void pickPhysicalDevice() {
         uint32_t deviceCount = 0;
-        vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+        vkEnumeratePhysicalDevices(this->vulkan->instance, &deviceCount, nullptr);
 
         if (deviceCount == 0) {
             throw runtime_error("failed to find GPUs with Vulkan support!");
         }
 
         vector<VkPhysicalDevice> devices(deviceCount);
-        vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+        vkEnumeratePhysicalDevices(this->vulkan->instance, &deviceCount, devices.data());
 
         multimap<int, VkPhysicalDevice> candidates;
 
@@ -1532,7 +1507,7 @@ private:
             return 0;
         }
 
-        QueueFamilyIndices indices = findQueueFamilies(device, surface);
+        QueueFamilyIndices indices = findQueueFamilies(device, this->vulkan->surface);
 
         if (!indices.isComplete() || !checkDeviceExtensionSupport(device)) {
             return 0;
@@ -1571,12 +1546,11 @@ private:
         if (capabilities.currentExtent.width != UINT32_MAX) {
             return capabilities.currentExtent;
         } else {
-            int width, height;
-            glfwGetFramebufferSize(window, &width, &height);
+            std::tuple<int,int> t = this->window->getSize();
 
             VkExtent2D actualExtent = {
-                static_cast<uint32_t> (width),
-                static_cast<uint32_t> (height)
+                static_cast<uint32_t> (std::get<0>(t)),
+                static_cast<uint32_t> (std::get<1>(t))
             };
 
             actualExtent.width = max(capabilities.minImageExtent.width, min(capabilities.maxImageExtent.width, actualExtent.width));
@@ -1602,28 +1576,8 @@ private:
         return requiredExtensions.empty();
     }
 
-    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT & createInfo) {
-        createInfo = {};
-        createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-        createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-        createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-        createInfo.pfnUserCallback = debugCallback;
-        createInfo.pUserData = nullptr; // Optional
-    }
-
-    void setupDebugMessenger() {
-        if (!enableValidationLayers) return;
-
-        VkDebugUtilsMessengerCreateInfoEXT createInfo;
-        populateDebugMessengerCreateInfo(createInfo);
-
-        if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
-            throw runtime_error("failed to set up debug messenger!");
-        }
-    }
-
     void mainLoop() {
-        while (!glfwWindowShouldClose(window)) {
+        while (!window->isClosed()) {
             glfwPollEvents();
             drawFrame();
         }
@@ -1774,137 +1728,16 @@ private:
 
         vkDestroyDevice(device, nullptr);
 
-        if (enableValidationLayers) {
-            DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
-        }
+        delete this->vulkan;
 
-        vkDestroySurfaceKHR(instance, surface, nullptr);
-
-        vkDestroyInstance(instance, nullptr);
-
-        glfwDestroyWindow(window);
-
-        glfwTerminate();
+        delete this->window;
     }
 
-    void createInstance() {
-        if (enableValidationLayers && !checkValidationLayerSupport()) {
-            throw runtime_error("validation layers requested, but not available!");
-        }
 
-        VkApplicationInfo appInfo = {};
-        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName = "Hello Triangle";
-        appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.pEngineName = "No Engine";
-        appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.apiVersion = VK_API_VERSION_1_0;
-
-        VkInstanceCreateInfo createInfo = {};
-        createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        createInfo.pApplicationInfo = &appInfo;
-
-        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
-        if (enableValidationLayers) {
-            createInfo.enabledLayerCount = static_cast<uint32_t> (validationLayers.size());
-            createInfo.ppEnabledLayerNames = validationLayers.data();
-            populateDebugMessengerCreateInfo(debugCreateInfo);
-            createInfo.pNext = &debugCreateInfo;
-        } else {
-            createInfo.enabledLayerCount = 0;
-            createInfo.pNext = nullptr;
-        }
-
-        auto extensions = getRequiredExtensions();
-        createInfo.enabledExtensionCount = static_cast<uint32_t> (extensions.size());
-        createInfo.ppEnabledExtensionNames = extensions.data();
-
-        VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
-        if (result != VK_SUCCESS) {
-            throw runtime_error("failed to create vulkan instance!");
-        }
-
+    void resize(int width, int height) {
+        this->framebufferResized = true;
     }
 
-    void initWindow() {
-        glfwInit();
-
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
-        this->window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
-        glfwSetWindowUserPointer(window, this);
-        glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
-    }
-
-    static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
-        auto app = reinterpret_cast<HelloTriangleApplication*> (glfwGetWindowUserPointer(window));
-
-        app->framebufferResized = true;
-    }
-
-    bool checkValidationLayerSupport() {
-        uint32_t layerCount;
-        vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-
-        vector<VkLayerProperties> availableLayers(layerCount);
-        vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-
-        for (const char* layerName : validationLayers) {
-            bool layerFound = false;
-
-            for (const auto& layerProperties : availableLayers) {
-                cout << layerProperties.layerName << endl;
-                if (strcmp(layerName, layerProperties.layerName) == 0) {
-                    layerFound = true;
-                    break;
-                }
-            }
-
-            if (!layerFound) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    vector<const char*> getRequiredExtensions() {
-        uint32_t glfwExtensionCount = 0;
-        const char** glfwExtensions;
-        glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-        vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-
-        if (enableValidationLayers) {
-            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-        }
-
-        cout << "Extensions: " << endl;
-        for (auto& extension : extensions) {
-            cout << extension << endl;
-        }
-
-        return extensions;
-    }
-
-    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-            VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-            VkDebugUtilsMessageTypeFlagsEXT messageType,
-            const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-            void* pUserData) {
-
-        cerr << std::hex << messageSeverity;
-        cerr << " Validation layer: ";
-        cerr << std::hex << messageType;
-        cerr << " [" << pCallbackData->pMessageIdName << "] " << pCallbackData->pMessage << endl;
-        for (int i = 0; i < pCallbackData->objectCount; ++i) {
-            const char* objectName = pCallbackData->pObjects[i].pObjectName == nullptr ? "" : pCallbackData->pObjects[i].pObjectName;
-            cerr << i << " object " << pCallbackData->pObjects[i].objectType;
-            cerr << " " << objectName << endl;
-        }
-
-        return VK_FALSE;
-    }
 };
 
 int main() {
