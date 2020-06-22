@@ -139,6 +139,7 @@ private:
         delete this->vertexShader;
         delete this->fragmentShader;
 
+        delete this->transformationMatrices;
         delete this->model;
 
         delete this->texture;

@@ -461,9 +461,7 @@ namespace zvlk {
     }
 
     void Device::freeCommandBuffers(std::vector<VkCommandBuffer>& commandBuffers) {
-        for (VkCommandBuffer commandBuffer : commandBuffers) {
-            vkFreeCommandBuffers(this->graphicsDevice, this->commandPool, commandBuffers.size(), commandBuffers.data());
-        }
+        vkFreeCommandBuffers(this->graphicsDevice, this->commandPool, commandBuffers.size(), commandBuffers.data());
     }
 
     void Device::allocateCommandBuffers(uint32_t frameNumbers, std::vector<VkCommandBuffer>& commandBuffers) {

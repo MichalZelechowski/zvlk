@@ -331,6 +331,7 @@ namespace zvlk {
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR) {
             //recreateSwapChain();
+            std::cout << "VK_ERROR_OUT_OF_DATE_KHR" <<std::endl;
             return;
         } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             throw std::runtime_error("failed to acquire swap chain image!");
@@ -381,6 +382,7 @@ namespace zvlk {
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
             //|| framebufferResized) {
+            std::cout << "VK_SUBOPTIMAL_KHR" <<std::endl;
             //framebufferResized = false;
             //recreateSwapChain();
             throw std::runtime_error("result on present is wrong!");
