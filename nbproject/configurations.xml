@@ -69,6 +69,7 @@
           <incDir>
             <pElem>include</pElem>
           </incDir>
+          <warningLevel>2</warningLevel>
         </ccTool>
         <linkerTool>
           <linkerLibItems>
@@ -231,7 +232,7 @@
       </toolsSet>
       <compileType>
         <ccTool>
-          <developmentMode>6</developmentMode>
+          <developmentMode>4</developmentMode>
           <standard>12</standard>
           <incDir>
             <pElem>include</pElem>
@@ -299,6 +300,90 @@
       <item path="include/WindowCallback.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="shader.frag" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shader.vert" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Debug_with_perf" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <developmentMode>3</developmentMode>
+          <stripSymbols>true</stripSymbols>
+          <standard>12</standard>
+          <incDir>
+            <pElem>include</pElem>
+          </incDir>
+          <commandLine>-O3 -Wall -fno-strict-aliasing</commandLine>
+        </ccTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerOptionItem>`pkg-config --libs vulkan`</linkerOptionItem>
+            <linkerOptionItem>`pkg-config --libs glfw3`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <item path="Device.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="Engine.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="FragmentShader.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="Frame.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="Model.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="Shader.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="Texture.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="TransformationMatrices.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="UniformBuffer.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="VertexShader.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="Vulkan.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="Window.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="WindowCallback.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="compile.bash" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Device.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Engine.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/FragmentShader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Frame.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Model.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Shader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Texture.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/TransformationMatrices.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/UniformBuffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/VertexShader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Vulkan.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Window.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/WindowCallback.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="12">
       </item>
       <item path="shader.frag" ex="false" tool="3" flavor2="0">
       </item>

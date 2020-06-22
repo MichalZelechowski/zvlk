@@ -25,7 +25,7 @@ namespace zvlk {
         uint32_t presentFamily;
 
         bool isComplete() {
-            return graphicsFamily != -1 && presentFamily != -1;
+            return graphicsFamily != -1U && presentFamily != -1U;
         }
 
         std::set<uint32_t> getUniqueQueueFamilies() {

@@ -31,7 +31,7 @@ DEFAULTCONF=Debug
 CONF=${DEFAULTCONF}
 
 # All Configurations
-ALLCONFS=Debug Release Release_new 
+ALLCONFS=Debug Release Release_new Debug_with_perf 
 
 
 # build

@@ -551,9 +551,9 @@ namespace zvlk {
         printProperty(os, "maxFragmentDualSrcAttachments", device.deviceProperties.limits.maxFragmentDualSrcAttachments, 20);
         printProperty(os, "maxFragmentCombinedOutputResources", device.deviceProperties.limits.maxFragmentCombinedOutputResources, 20);
         printProperty(os, "maxComputeSharedMemorySize", device.deviceProperties.limits.maxComputeSharedMemorySize, 20);
-        printProperty(os, "maxComputeWorkGroupCount[3]", device.deviceProperties.limits.maxComputeWorkGroupCount[3], 20);
+        printProperty(os, "maxComputeWorkGroupCount[3]", device.deviceProperties.limits.maxComputeWorkGroupCount, 20);
         printProperty(os, "maxComputeWorkGroupInvocations", device.deviceProperties.limits.maxComputeWorkGroupInvocations, 20);
-        printProperty(os, "maxComputeWorkGroupSize[3]", device.deviceProperties.limits.maxComputeWorkGroupSize[3], 20);
+        printProperty(os, "maxComputeWorkGroupSize[3]", device.deviceProperties.limits.maxComputeWorkGroupSize, 20);
         printProperty(os, "subPixelPrecisionBits", device.deviceProperties.limits.subPixelPrecisionBits, 20);
         printProperty(os, "subTexelPrecisionBits", device.deviceProperties.limits.subTexelPrecisionBits, 20);
         printProperty(os, "mipmapPrecisionBits", device.deviceProperties.limits.mipmapPrecisionBits, 20);
@@ -562,8 +562,8 @@ namespace zvlk {
         printProperty(os, "maxSamplerLodBias", device.deviceProperties.limits.maxSamplerLodBias, 20);
         printProperty(os, "maxSamplerAnisotropy", device.deviceProperties.limits.maxSamplerAnisotropy, 20);
         printProperty(os, "maxViewports", device.deviceProperties.limits.maxViewports, 20);
-        printProperty(os, "maxViewportDimensions[2]", device.deviceProperties.limits.maxViewportDimensions[2], 20);
-        printProperty(os, "viewportBoundsRange[2]", device.deviceProperties.limits.viewportBoundsRange[2], 20);
+        printProperty(os, "maxViewportDimensions[2]", device.deviceProperties.limits.maxViewportDimensions, 20);
+        printProperty(os, "viewportBoundsRange[2]", device.deviceProperties.limits.viewportBoundsRange, 20);
         printProperty(os, "viewportSubPixelBits", device.deviceProperties.limits.viewportSubPixelBits, 20);
         printProperty(os, "minMemoryMapAlignment", device.deviceProperties.limits.minMemoryMapAlignment, 20);
         printProperty(os, "minTexelBufferOffsetAlignment", device.deviceProperties.limits.minTexelBufferOffsetAlignment, 20);
@@ -596,8 +596,8 @@ namespace zvlk {
         printProperty(os, "maxCullDistances", device.deviceProperties.limits.maxCullDistances, 20);
         printProperty(os, "maxCombinedClipAndCullDistances", device.deviceProperties.limits.maxCombinedClipAndCullDistances, 20);
         printProperty(os, "discreteQueuePriorities", device.deviceProperties.limits.discreteQueuePriorities, 20);
-        printProperty(os, "pointSizeRange[2]", device.deviceProperties.limits.pointSizeRange[2], 20);
-        printProperty(os, "lineWidthRange[2]", device.deviceProperties.limits.lineWidthRange[2], 20);
+        printProperty(os, "pointSizeRange[2]", device.deviceProperties.limits.pointSizeRange, 20);
+        printProperty(os, "lineWidthRange[2]", device.deviceProperties.limits.lineWidthRange, 20);
         printProperty(os, "pointSizeGranularity", device.deviceProperties.limits.pointSizeGranularity, 20);
         printProperty(os, "lineWidthGranularity", device.deviceProperties.limits.lineWidthGranularity, 20);
         printProperty(os, "strictLines", device.deviceProperties.limits.strictLines, 20);

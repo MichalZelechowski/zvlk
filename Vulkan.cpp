@@ -164,7 +164,7 @@ namespace zvlk {
         std::cerr << " Validation layer: ";
         std::cerr << std::hex << messageType;
         std::cerr << " [" << pCallbackData->pMessageIdName << "] " << pCallbackData->pMessage << std::endl;
-        for (int i = 0; i < pCallbackData->objectCount; ++i) {
+        for (uint32_t i = 0; i < pCallbackData->objectCount; ++i) {
             const char* objectName = pCallbackData->pObjects[i].pObjectName == nullptr ? "" : pCallbackData->pObjects[i].pObjectName;
             std::cerr << i << " object " << pCallbackData->pObjects[i].objectType;
             std::cerr << " " << objectName << std::endl;

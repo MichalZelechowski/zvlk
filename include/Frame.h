@@ -12,6 +12,7 @@
 
 #include <GLFW/glfw3.h>
 #include <vector>
+#include <array>
 
 #include "Device.h"
 
@@ -55,6 +56,7 @@ namespace zvlk {
         VkDeviceMemory depthImageMemory;
         VkImageView depthImageView;
         std::vector<VkFramebuffer> swapChainFramebuffers;
+        std::vector<VkClearValue> clearValues;
 
         VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
         VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);

@@ -214,6 +214,16 @@ namespace zvlk {
                 throw std::runtime_error("failed to create framebuffer!");
             }
         }
+
+        VkClearValue _0 = {};
+        _0.color = {1.0f, 0.0f, 0.0f, 1.0f};
+        VkClearValue _1 = {};
+        _1.depthStencil = {1.0f, 0};
+        VkClearValue _2 = {};
+        _2.color = {1.0f, 0.0f, 0.0f, 1.0f};
+        this->clearValues.push_back(_0);
+        this->clearValues.push_back(_1);
+        this->clearValues.push_back(_2);
     }
 
     VkSurfaceFormatKHR Frame::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
@@ -262,7 +272,6 @@ namespace zvlk {
             // TODO this is clearly related to window, has to hook it up somehow
             //std::tuple<int, int> t = this->window->getSize()
             auto t = std::make_tuple(800, 600);
-
             VkExtent2D actualExtent = {
                 static_cast<uint32_t> (std::get<0>(t)),
                 static_cast<uint32_t> (std::get<1>(t))
@@ -286,15 +295,9 @@ namespace zvlk {
         renderPassInfo.framebuffer = this->swapChainFramebuffers[index];
         renderPassInfo.renderArea.offset = {0, 0};
         renderPassInfo.renderArea.extent = this->swapChainExtent;
-        
-        std::array<VkClearValue, 3> clearValues{};
-        clearValues[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
-        clearValues[1].depthStencil = {1.0f, 0};
-        clearValues[2].color = {0.0f, 0.0f, 0.0f, 1.0f};
 
         renderPassInfo.clearValueCount = clearValues.size();
         renderPassInfo.pClearValues = clearValues.data();
-
         return renderPassInfo;
     }
 }
