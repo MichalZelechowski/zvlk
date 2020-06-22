@@ -22,8 +22,14 @@
 
 #include "Window.h"
 #include "Device.h"
+#include "Frame.h"
 
 namespace zvlk {
+
+    class DeviceAssessment {
+    public:
+        virtual int assess(Device* device) = 0;
+    };
 
     class Vulkan {
     public:
@@ -33,12 +39,16 @@ namespace zvlk {
         virtual ~Vulkan();
 
         void addSurface(zvlk::Window* window);
+        zvlk::Device* getDevice(zvlk::DeviceAssessment* assessment);
+        zvlk::Frame* initializeDeviceForGraphics(zvlk::Device* device);
+        bool doesDeviceSupportExtensions(zvlk::Device* device);
+        bool doesDeviceSupportGraphics(zvlk::Device* device);
+        zvlk::SwapChainSupportDetails querySwapChainSupport(zvlk::Device* device);
 
         VkSurfaceKHR surface = nullptr;
         VkInstance instance;
     private:
-
-        std::vector<std::unique_ptr<Device>> devices;
+        std::vector<zvlk::Device*> devices;
         bool debug;
         VkDebugUtilsMessengerEXT debugMessenger;
 
@@ -46,6 +56,10 @@ namespace zvlk {
             //    "VK_LAYER_KHRONOS_validation"
             "VK_LAYER_LUNARG_standard_validation"
         };
+        const std::vector<const char*> deviceExtensions = {
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME
+        };
+
 
         bool checkValidationLayerSupport();
         std::vector<const char*> getRequiredExtensions();
@@ -59,6 +73,8 @@ namespace zvlk {
                 void* pUserData);
 
     };
+
+
 }
 #endif /* VULKAN_H */
 

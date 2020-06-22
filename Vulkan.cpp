@@ -10,6 +10,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstring>
+#include <algorithm>
 
 namespace zvlk {
 
@@ -57,15 +58,19 @@ namespace zvlk {
 
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices(this->instance, &deviceCount, nullptr);
-        this->devices.resize(deviceCount);
         std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
         vkEnumeratePhysicalDevices(this->instance, &deviceCount, physicalDevices.data());
+        this->devices.resize(deviceCount);
         for (VkPhysicalDevice pD : physicalDevices) {
-            this->devices.push_back(std::unique_ptr<Device>(new Device(pD)));
+            this->devices.push_back(new Device(pD));
         }
     }
 
     Vulkan::~Vulkan() {
+        for (Device* device : this->devices) {
+            delete device;
+        }
+
         if (this->surface != nullptr) {
             vkDestroySurfaceKHR(this->instance, surface, nullptr);
         }
@@ -167,6 +172,35 @@ namespace zvlk {
         }
 
         return VK_FALSE;
+    }
+
+    Device* Vulkan::getDevice(DeviceAssessment* assessment) {
+        std::vector<int> scores(this->devices.size());
+
+        for (Device* device : this->devices) {
+            scores.push_back(assessment->assess(device));
+        }
+
+        Device* result = this->devices[std::distance(scores.begin(), std::max_element(scores.begin(), scores.end()))];
+        return result;
+    }
+
+    Frame* Vulkan::initializeDeviceForGraphics(zvlk::Device* device) {
+        const std::vector<const char*> noValidations;
+        zvlk::Frame* result = device->initializeForGraphics(this->surface, this->debug ? validationLayers : noValidations, deviceExtensions);
+        return result;
+    }
+
+    bool Vulkan::doesDeviceSupportExtensions(zvlk::Device* device) {
+        return device->doesSupportExtensions(this->deviceExtensions);
+    }
+
+    bool Vulkan::doesDeviceSupportGraphics(zvlk::Device* device) {
+        return device->doesSupportGraphics(this->surface);
+    }
+
+    zvlk::SwapChainSupportDetails Vulkan::querySwapChainSupport(zvlk::Device* device) {
+        return device->querySwapChainSupport(this->surface);
     }
 
 }

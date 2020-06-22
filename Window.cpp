@@ -14,6 +14,7 @@ namespace zvlk {
         glfwInit(); //TODO remove to some other init
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         this->window = glfwCreateWindow(width, height, title.data(), nullptr, nullptr);
         this->callback = callback;
