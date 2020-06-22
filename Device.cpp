@@ -127,6 +127,8 @@ namespace zvlk {
             details.presentModes.resize(presentModeCount);
             vkGetPhysicalDeviceSurfacePresentModesKHR(this->physicalDevice, surface, &presentModeCount, details.presentModes.data());
         }
+        
+        return details;
     }
 
     zvlk::QueueFamilyIndices Device::findQueueFamilies(VkSurfaceKHR surface) {

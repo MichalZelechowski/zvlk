@@ -60,7 +60,6 @@ namespace zvlk {
         vkEnumeratePhysicalDevices(this->instance, &deviceCount, nullptr);
         std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
         vkEnumeratePhysicalDevices(this->instance, &deviceCount, physicalDevices.data());
-        this->devices.resize(deviceCount);
         for (VkPhysicalDevice pD : physicalDevices) {
             this->devices.push_back(new Device(pD));
         }
@@ -175,7 +174,7 @@ namespace zvlk {
     }
 
     Device* Vulkan::getDevice(DeviceAssessment* assessment) {
-        std::vector<int> scores(this->devices.size());
+        std::vector<int> scores;
 
         for (Device* device : this->devices) {
             scores.push_back(assessment->assess(device));
