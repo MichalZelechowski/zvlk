@@ -57,8 +57,8 @@ private:
 
         this->model = new zvlk::Model(this->device, "viking_room.obj");
 
-        this->vertexShader = new zvlk::VertexShader(this->device->getGraphicsDevice(), "shader.vert");
-        this->fragmentShader = new zvlk::FragmentShader(this->device->getGraphicsDevice(), "shader.frag");
+        this->vertexShader = new zvlk::VertexShader(this->device->getGraphicsDevice(), "vert.spv");
+        this->fragmentShader = new zvlk::FragmentShader(this->device->getGraphicsDevice(), "frag.spv");
 
         this->transformationMatrices = new zvlk::TransformationMatrices(this->device, this->frame);
 
@@ -67,6 +67,8 @@ private:
         this->engine->enableShaders(*this->vertexShader, *this->fragmentShader);
         this->engine->draw(*this->model, *this->transformationMatrices, *this->texture);
         this->engine->compile();
+        
+        this->engine->addCallback(this);
     }
 
     int assess(zvlk::Device* device) {
