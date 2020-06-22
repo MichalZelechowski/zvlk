@@ -4,6 +4,19 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>include/Device.h</itemPath>
+      <itemPath>include/Engine.h</itemPath>
+      <itemPath>include/FragmentShader.h</itemPath>
+      <itemPath>include/Frame.h</itemPath>
+      <itemPath>include/Model.h</itemPath>
+      <itemPath>include/Shader.h</itemPath>
+      <itemPath>include/Texture.h</itemPath>
+      <itemPath>include/TransformationMatrices.h</itemPath>
+      <itemPath>include/UniformBuffer.h</itemPath>
+      <itemPath>include/VertexShader.h</itemPath>
+      <itemPath>include/Vulkan.h</itemPath>
+      <itemPath>include/Window.h</itemPath>
+      <itemPath>include/WindowCallback.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -12,6 +25,19 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>Device.cpp</itemPath>
+      <itemPath>Engine.cpp</itemPath>
+      <itemPath>FragmentShader.cpp</itemPath>
+      <itemPath>Frame.cpp</itemPath>
+      <itemPath>Model.cpp</itemPath>
+      <itemPath>Shader.cpp</itemPath>
+      <itemPath>Texture.cpp</itemPath>
+      <itemPath>TransformationMatrices.cpp</itemPath>
+      <itemPath>UniformBuffer.cpp</itemPath>
+      <itemPath>VertexShader.cpp</itemPath>
+      <itemPath>Vulkan.cpp</itemPath>
+      <itemPath>Window.cpp</itemPath>
+      <itemPath>WindowCallback.cpp</itemPath>
       <itemPath>main.cpp</itemPath>
       <itemPath>shader.frag</itemPath>
       <itemPath>shader.vert</itemPath>
@@ -27,19 +53,7 @@
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
-    <logicalFolder name="TestFiles"
-                   displayName="Test Files"
-                   projectFiles="false"
-                   kind="TEST_LOGICAL_FOLDER">
-    </logicalFolder>
-    <logicalFolder name="ExternalFiles"
-                   displayName="Important Files"
-                   projectFiles="false"
-                   kind="IMPORTANT_FILES_FOLDER">
-      <itemPath>Makefile</itemPath>
-    </logicalFolder>
     <itemPath>compile.bash</itemPath>
-    <itemPath>README.md</itemPath>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -55,6 +69,7 @@
           <incDir>
             <pElem>include</pElem>
           </incDir>
+          <warningLevel>2</warningLevel>
         </ccTool>
         <linkerTool>
           <linkerLibItems>
@@ -63,9 +78,59 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="README.md" ex="false" tool="3" flavor2="0">
+      <item path="Device.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Engine.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FragmentShader.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Frame.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Model.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Shader.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Texture.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="TransformationMatrices.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="UniformBuffer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="VertexShader.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Vulkan.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Window.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="WindowCallback.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="compile.bash" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Device.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Engine.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/FragmentShader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Frame.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Model.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Shader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Texture.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/TransformationMatrices.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/UniformBuffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/VertexShader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Vulkan.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Window.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/WindowCallback.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -81,47 +146,15 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
-        <cTool>
-          <developmentMode>5</developmentMode>
-        </cTool>
-        <ccTool>
-          <developmentMode>5</developmentMode>
-          <standard>12</standard>
-          <incDir>
-            <pElem>include</pElem>
-          </incDir>
-        </ccTool>
-        <fortranCompilerTool>
-          <developmentMode>5</developmentMode>
-        </fortranCompilerTool>
-        <asmTool>
-          <developmentMode>5</developmentMode>
-        </asmTool>
-      </compileType>
-      <item path="README.md" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="compile.bash" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="main.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="shader.frag" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shader.vert" ex="false" tool="3" flavor2="0">
-      </item>
-    </conf>
-    <conf name="Release_new" type="1">
-      <toolsSet>
-        <compilerSet>default</compilerSet>
-        <dependencyChecking>true</dependencyChecking>
-        <rebuildPropChanged>false</rebuildPropChanged>
-      </toolsSet>
-      <compileType>
         <ccTool>
           <developmentMode>6</developmentMode>
+          <stripSymbols>true</stripSymbols>
           <standard>12</standard>
           <incDir>
             <pElem>include</pElem>
           </incDir>
+          <commandLine>-fno-strict-aliasing</commandLine>
+          <warningLevel>0</warningLevel>
         </ccTool>
         <linkerTool>
           <linkerLibItems>
@@ -130,11 +163,61 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="README.md" ex="false" tool="3" flavor2="0">
+      <item path="Device.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="Engine.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="FragmentShader.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="Frame.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="Model.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="Shader.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="Texture.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="TransformationMatrices.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="UniformBuffer.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="VertexShader.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="Vulkan.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="Window.cpp" ex="false" tool="1" flavor2="12">
+      </item>
+      <item path="WindowCallback.cpp" ex="false" tool="1" flavor2="12">
       </item>
       <item path="compile.bash" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      <item path="include/Device.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Engine.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/FragmentShader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Frame.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Model.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Shader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Texture.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/TransformationMatrices.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/UniformBuffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/VertexShader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Vulkan.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Window.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/WindowCallback.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="12">
       </item>
       <item path="shader.frag" ex="false" tool="3" flavor2="0">
       </item>

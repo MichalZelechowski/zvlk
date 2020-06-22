@@ -5,4 +5,3 @@
 #
 # Debug configuration
 # Release configuration
-# Release_new configuration
