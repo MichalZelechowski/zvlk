@@ -13,8 +13,9 @@
 
 #ifndef VULKAN_H
 #define VULKAN_H
-#define GLFW_INCLUDE_VULKAN
 
+#include <vulkan/vulkan_core.h>
+#include <vulkan/vulkan.hpp>
 #include <GLFW/glfw3.h>
 #include <vector>
 #include <string>
@@ -28,7 +29,7 @@ namespace zvlk {
 
     class DeviceAssessment {
     public:
-        virtual int assess(Device* device) = 0;
+        virtual int assess(zvlk::Device* device) = 0;
     };
 
     class Vulkan {
@@ -45,12 +46,12 @@ namespace zvlk {
         bool doesDeviceSupportGraphics(zvlk::Device* device);
         zvlk::SwapChainSupportDetails querySwapChainSupport(zvlk::Device* device);
 
-        VkSurfaceKHR surface = nullptr;
-        VkInstance instance;
+        vk::SurfaceKHR surface;
+        vk::Instance instance;
     private:
         std::vector<zvlk::Device*> devices;
         bool debug;
-        VkDebugUtilsMessengerEXT debugMessenger;
+        vk::DebugUtilsMessengerEXT debugMessenger;
 
         const std::vector<const char*> validationLayers = {
             //    "VK_LAYER_KHRONOS_validation"
@@ -63,8 +64,6 @@ namespace zvlk {
 
         bool checkValidationLayerSupport();
         std::vector<const char*> getRequiredExtensions();
-        void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& debugCreateInfo);
-        VkResult createDebugUtilsMessenger(const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo);
 
         static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
                 VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,

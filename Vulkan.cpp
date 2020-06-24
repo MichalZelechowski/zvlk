@@ -12,6 +12,7 @@
 #include <cstring>
 #include <algorithm>
 
+
 namespace zvlk {
 
     Vulkan::Vulkan(bool debug, std::string applicationName) {
@@ -20,46 +21,33 @@ namespace zvlk {
             throw std::runtime_error("validation layers requested, but not available!");
         }
 
-        VkApplicationInfo appInfo = {};
-        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName = applicationName.data();
-        appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.pEngineName = "No Engine";
-        appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.apiVersion = VK_API_VERSION_1_0;
-
-        VkInstanceCreateInfo createInfo = {};
-        createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        createInfo.pApplicationInfo = &appInfo;
-
-        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
-        if (debug) {
-            createInfo.enabledLayerCount = static_cast<uint32_t> (validationLayers.size());
-            createInfo.ppEnabledLayerNames = validationLayers.data();
-            this->populateDebugMessengerCreateInfo(debugCreateInfo);
-            createInfo.pNext = &debugCreateInfo;
-        } else {
-            createInfo.enabledLayerCount = 0;
-            createInfo.pNext = nullptr;
-        }
-
         auto extensions = getRequiredExtensions();
-        createInfo.enabledExtensionCount = static_cast<uint32_t> (extensions.size());
-        createInfo.ppEnabledExtensionNames = extensions.data();
 
-        VkResult result = vkCreateInstance(&createInfo, nullptr, &this->instance);
-        if (result != VK_SUCCESS) {
-            throw std::runtime_error("failed to create vulkan instance!");
+        vk::ApplicationInfo appInfo(applicationName.data(), VK_MAKE_VERSION(1, 0, 0), "No Engine", VK_MAKE_VERSION(1, 0, 0), VK_API_VERSION_1_0);
+        vk::InstanceCreateInfo createInfo(vk::InstanceCreateFlags(), &appInfo,
+                debug ? static_cast<uint32_t> (validationLayers.size()) : 0,
+                debug ? validationLayers.data() : nullptr,
+                static_cast<uint32_t> (extensions.size()),
+                extensions.data());
+
+        if (debug) {
+            vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo({},
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose | vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo | vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning | vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
+                    vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
+                    debugCallback);
+            createInfo.setPNext(&debugCreateInfo);
+
+            this->instance = vk::createInstance(createInfo);
+
+            vk::DispatchLoaderDynamic dldy;
+            dldy.init(instance);
+
+            this->debugMessenger = this->instance.createDebugUtilsMessengerEXT(debugCreateInfo, nullptr, dldy);
+        } else {
+            this->instance = vk::createInstance(createInfo);
         }
 
-        if (debug && this->createDebugUtilsMessenger(const_cast<VkDebugUtilsMessengerCreateInfoEXT*> (&debugCreateInfo)) != VK_SUCCESS) {
-            throw std::runtime_error("failed to set up debug messenger!");
-        }
-
-        uint32_t deviceCount = 0;
-        vkEnumeratePhysicalDevices(this->instance, &deviceCount, nullptr);
-        std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
-        vkEnumeratePhysicalDevices(this->instance, &deviceCount, physicalDevices.data());
+        std::vector<vk::PhysicalDevice> physicalDevices = this->instance.enumeratePhysicalDevices();
         for (VkPhysicalDevice pD : physicalDevices) {
             this->devices.push_back(new Device(pD));
         }
@@ -70,51 +58,29 @@ namespace zvlk {
             delete device;
         }
 
-        if (this->surface != nullptr) {
-            vkDestroySurfaceKHR(this->instance, surface, nullptr);
+        if (this->surface) {
+            this->instance.destroySurfaceKHR(this->surface);
         }
 
         if (this->debug) {
-            auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-            if (func != nullptr) {
-                func(this->instance, this->debugMessenger, nullptr);
-            }
+            vk::DispatchLoaderDynamic dldy;
+            dldy.init(this->instance);
+            this->instance.destroyDebugUtilsMessengerEXT(this->debugMessenger, nullptr, dldy);
         }
 
-        vkDestroyInstance(instance, nullptr);
-    }
-
-    void Vulkan::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& debugCreateInfo) {
-        debugCreateInfo = {};
-        debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-        debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-        debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-        debugCreateInfo.pfnUserCallback = debugCallback;
-        debugCreateInfo.pUserData = nullptr;
-    }
-
-    VkResult Vulkan::createDebugUtilsMessenger(const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo) {
-        auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(this->instance, "vkCreateDebugUtilsMessengerEXT");
-        if (func != nullptr) {
-            return func(this->instance, pCreateInfo, nullptr, &this->debugMessenger);
-        } else {
-            return VK_ERROR_EXTENSION_NOT_PRESENT;
-        }
+        this->instance.destroy();
     }
 
     void Vulkan::addSurface(zvlk::Window* window) {
-        //TODO think about vector
-        if (this->surface != nullptr || glfwCreateWindowSurface(this->instance, window->getWindow(), nullptr, &surface) != VK_SUCCESS) {
+        VkSurfaceKHR surfaceClassic;
+        if (this->surface || glfwCreateWindowSurface(this->instance, window->getWindow(), nullptr, &surfaceClassic) != VK_SUCCESS) {
             throw std::runtime_error("failed to create window surface!");
         }
+        this->surface = surfaceClassic;
     }
 
     bool Vulkan::checkValidationLayerSupport() {
-        uint32_t layerCount;
-        vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-
-        std::vector<VkLayerProperties> availableLayers(layerCount);
-        vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+        std::vector<vk::LayerProperties> availableLayers = vk::enumerateInstanceLayerProperties();
 
         for (const char* layerName : this->validationLayers) {
             bool layerFound = false;
