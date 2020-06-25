@@ -8,11 +8,11 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group name="Vulkan">
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Device.cpp</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Frame.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/main.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/TransformationMatrices.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/WindowCallback.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Model.h</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Device.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Window.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Vulkan.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/WindowCallback.cpp</file>

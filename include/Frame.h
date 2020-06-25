@@ -24,44 +24,44 @@ namespace zvlk {
     class Frame {
     public:
         Frame() = delete;
-        Frame(zvlk::Device* device, VkSurfaceKHR& surface);
+        Frame(zvlk::Device* device, vk::SurfaceKHR surface);
         Frame(const Frame& orig) = delete;
         virtual ~Frame();
 
-        zvlk::SwapChainSupportDetails querySwapChainSupport(VkSurfaceKHR surface, const VkDevice graphicsDevice);
+        zvlk::SwapChainSupportDetails querySwapChainSupport(vk::SurfaceKHR surface, const vk::Device graphicsDevice);
         uint32_t getImagesNumber();
         uint32_t getWidth();
         uint32_t getHeight();
-        VkRenderPass getRenderPass();
+        vk::RenderPass getRenderPass();
 
-        inline VkSwapchainKHR getShwapChain() {
+        inline vk::SwapchainKHR getShwapChain() const{
             return this->swapChain;
         };
         
-        VkRenderPassBeginInfo getRenderPassBeginInfo(uint32_t index);
+        vk::RenderPassBeginInfo getRenderPassBeginInfo(uint32_t index) const;
     private:
-        VkDevice graphicsDevice;
+        vk::Device graphicsDevice;
 
-        VkSwapchainKHR swapChain;
-        std::vector<VkImage> swapChainImages;
-        VkFormat swapChainImageFormat;
-        VkExtent2D swapChainExtent;
-        std::vector<VkImageView> swapChainImageViews;
+        vk::SwapchainKHR swapChain;
+        std::vector<vk::Image> swapChainImages;
+        vk::Format swapChainImageFormat;
+        vk::Extent2D swapChainExtent;
+        std::vector<vk::ImageView> swapChainImageViews;
 
-        VkRenderPass renderPass;
-        VkImage colorImage;
-        VkDeviceMemory colorImageMemory;
-        VkImageView colorImageView;
-        VkImage depthImage;
-        VkDeviceMemory depthImageMemory;
-        VkImageView depthImageView;
-        std::vector<VkFramebuffer> swapChainFramebuffers;
-        std::vector<VkClearValue> clearValues;
+        vk::RenderPass renderPass;
+        vk::Image colorImage;
+        vk::DeviceMemory colorImageMemory;
+        vk::ImageView colorImageView;
+        vk::Image depthImage;
+        vk::DeviceMemory depthImageMemory;
+        vk::ImageView depthImageView;
+        std::vector<vk::Framebuffer> swapChainFramebuffers;
+        std::vector<vk::ClearValue> clearValues;
 
-        VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-        VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-        VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR & capabilities);
-        VkFormat findDepthFormat(zvlk::Device* device);
+        vk::SurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats);
+        vk::PresentModeKHR chooseSwapPresentMode(const std::vector<vk::PresentModeKHR>& availablePresentModes);
+        vk::Extent2D chooseSwapExtent(const vk::SurfaceCapabilitiesKHR & capabilities);
+        vk::Format findDepthFormat(zvlk::Device* device);
 
     };
 }

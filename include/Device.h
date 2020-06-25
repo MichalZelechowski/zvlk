@@ -7,9 +7,8 @@
 
 #ifndef DEVICE_H
 #define DEVICE_H
-#define GLFW_INCLUDE_VULKAN
 
-#include <GLFW/glfw3.h>
+#include <vulkan/vulkan.hpp>
 #include <vector>
 #include <iostream>
 #include <set>
@@ -35,9 +34,9 @@ namespace zvlk {
     } QueueFamilyIndices;
 
     typedef struct SwapChainSupportDetails {
-        VkSurfaceCapabilitiesKHR capabilities;
-        std::vector<VkSurfaceFormatKHR> formats;
-        std::vector<VkPresentModeKHR> presentModes;
+        vk::SurfaceCapabilitiesKHR capabilities;
+        std::vector<vk::SurfaceFormatKHR> formats;
+        std::vector<vk::PresentModeKHR> presentModes;
     } SwapChainSupportDetails;
 
     class Device {
@@ -45,66 +44,66 @@ namespace zvlk {
         Device() = delete;
         Device(const Device& orig) = delete;
 
-        Device(VkPhysicalDevice physicalDevice);
+        Device(vk::PhysicalDevice physicalDevice);
         virtual ~Device();
 
-        VkPhysicalDevice getDevice() {
+        vk::PhysicalDevice getDevice() {
             return this->physicalDevice;
         }
 
-        VkDevice getGraphicsDevice() {
+        vk::Device getGraphicsDevice() {
             return this->graphicsDevice;
         }
 
-        const VkPhysicalDeviceProperties& getProperties();
-        const VkPhysicalDeviceFeatures& getFeatures();
-        const VkPhysicalDeviceMemoryProperties& getMemoryProperties();
-        const VkFormatProperties getFormatProperties(VkFormat format);
-        VkSampleCountFlagBits getMaxUsableSampleCount();
+        const vk::PhysicalDeviceProperties& getProperties();
+        const vk::PhysicalDeviceFeatures& getFeatures();
+        const vk::PhysicalDeviceMemoryProperties& getMemoryProperties();
+        const vk::FormatProperties getFormatProperties(vk::Format format);
+        vk::SampleCountFlagBits getMaxUsableSampleCount();
 
-        zvlk::Frame* initializeForGraphics(VkSurfaceKHR surface, const std::vector<const char*>, const std::vector<const char*> deviceExtensions);
+        zvlk::Frame* initializeForGraphics(vk::SurfaceKHR surface, const std::vector<const char*>, const std::vector<const char*> deviceExtensions);
 
         bool doesSupportExtensions(const std::vector<const char*> extensions);
-        bool doesSupportGraphics(VkSurfaceKHR surface);
+        bool doesSupportGraphics(vk::SurfaceKHR surface);
 
-        zvlk::SwapChainSupportDetails querySwapChainSupport(VkSurfaceKHR surface);
-        zvlk::QueueFamilyIndices findQueueFamilies(VkSurfaceKHR surface);
-        void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels);
+        zvlk::SwapChainSupportDetails querySwapChainSupport(vk::SurfaceKHR surface);
+        zvlk::QueueFamilyIndices findQueueFamilies(vk::SurfaceKHR surface);
+        void transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout, uint32_t mipLevels);
 
-        VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels);
+        vk::ImageView createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags, uint32_t mipLevels);
         void createImage(uint32_t width, uint32_t height, uint32_t mipLevels,
-                VkSampleCountFlagBits numSamples,
-                VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
-                VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
-        void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-        void copyMemory(VkDeviceSize size, void* content, VkBuffer& buffer, VkDeviceMemory& memory);
-        void copyMemory(VkDeviceSize size, void* content, VkDeviceMemory& memory);
-        void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-        void freeMemory(VkBuffer buffer, VkDeviceMemory memory);
-        void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-        void freeCommandBuffers(std::vector<VkCommandBuffer>& commandBuffers);
-        VkCommandBuffer beginSingleTimeCommands();
-        void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+                vk::SampleCountFlagBits numSamples,
+                vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage,
+                vk::MemoryPropertyFlags properties, vk::Image& image, vk::DeviceMemory& imageMemory);
+        void createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Buffer& buffer, vk::DeviceMemory& bufferMemory);
+        void copyMemory(vk::DeviceSize size, void* content, vk::Buffer& buffer, vk::DeviceMemory& memory);
+        void copyMemory(vk::DeviceSize size, void* content, vk::DeviceMemory& memory);
+        void copyBufferToImage(vk::Buffer buffer, vk::Image image, uint32_t width, uint32_t height);
+        void freeMemory(vk::Buffer buffer, vk::DeviceMemory memory);
+        void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size);
+        void freeCommandBuffers(std::vector<vk::CommandBuffer>& commandBuffers);
+        vk::CommandBuffer beginSingleTimeCommands();
+        void endSingleTimeCommands(vk::CommandBuffer commandBuffer);
 
-        void allocateCommandBuffers(uint32_t frameNumbers, std::vector<VkCommandBuffer>& commandBuffers);
+        void allocateCommandBuffers(uint32_t frameNumbers, std::vector<vk::CommandBuffer>& commandBuffers);
 
-        void submitGraphics(VkSubmitInfo* submitInfo, VkFence fence);
-        VkResult present(VkPresentInfoKHR* presentInfo);
+        void submitGraphics(vk::SubmitInfo* submitInfo, vk::Fence fence);
+        vk::Result present(vk::PresentInfoKHR* presentInfo);
         
         friend std::ostream& operator<<(std::ostream& os, const Device& device);
     private:
-        VkPhysicalDevice physicalDevice;
-        VkPhysicalDeviceProperties deviceProperties;
-        VkPhysicalDeviceFeatures deviceFeatures;
-        VkPhysicalDeviceMemoryProperties memoryProperties;
-        std::vector<VkExtensionProperties> availableExtensions;
-        std::vector<VkQueueFamilyProperties> queueFamilies;
-        VkDevice graphicsDevice;
-        VkQueue graphicsQueue;
-        VkQueue presentQueue;
-        VkCommandPool commandPool;
+        vk::PhysicalDevice physicalDevice;
+        vk::PhysicalDeviceProperties deviceProperties;
+        vk::PhysicalDeviceFeatures deviceFeatures;
+        vk::PhysicalDeviceMemoryProperties memoryProperties;
+        std::vector<vk::ExtensionProperties> availableExtensions;
+        std::vector<vk::QueueFamilyProperties> queueFamilies;
+        vk::Device graphicsDevice;
+        vk::Queue graphicsQueue;
+        vk::Queue presentQueue;
+        vk::CommandPool commandPool;
 
-        uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+        uint32_t findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties);
     };
 }
 #endif /* DEVICE_H */
