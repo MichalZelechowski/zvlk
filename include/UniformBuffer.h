@@ -8,9 +8,7 @@
 #ifndef UNIFORMBUFFER_H
 #define UNIFORMBUFFER_H
 
-#define GLFW_INCLUDE_VULKAN
-
-#include <GLFW/glfw3.h>
+#include <vulkan/vulkan.hpp>
 
 #include "Device.h"
 #include "Frame.h"
@@ -21,20 +19,20 @@ namespace zvlk {
     public:
         UniformBuffer() = delete;
         UniformBuffer(const UniformBuffer& orig) = delete;
-        UniformBuffer(zvlk::Device* device, VkDeviceSize size, zvlk::Frame* frame);
+        UniformBuffer(zvlk::Device* device, vk::DeviceSize size, zvlk::Frame* frame);
         virtual ~UniformBuffer();
 
         void update(uint32_t index);
-        VkDeviceSize getSize();
-        VkDescriptorBufferInfo getDescriptorBufferInfo(uint32_t frame);
+        vk::DeviceSize getSize();
+        vk::DescriptorBufferInfo getDescriptorBufferInfo(uint32_t frame);
     protected:
         virtual void* update(uint32_t index, float time) = 0;
     private:
         zvlk::Device* device;
-        VkDeviceSize size;
-        std::vector<VkBuffer> uniformBuffers;
-        std::vector<VkDeviceMemory> uniformBuffersMemory;
-        VkWriteDescriptorSet writeDescriptorSet;
+        vk::DeviceSize size;
+        std::vector<vk::Buffer> uniformBuffers;
+        std::vector<vk::DeviceMemory> uniformBuffersMemory;
+        vk::WriteDescriptorSet writeDescriptorSet;
 
     };
 }

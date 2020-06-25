@@ -17,7 +17,7 @@ namespace zvlk {
         }
     }
 
-    UniformBuffer::UniformBuffer(zvlk::Device* device, VkDeviceSize size, zvlk::Frame* frame) {
+    UniformBuffer::UniformBuffer(zvlk::Device* device, vk::DeviceSize size, zvlk::Frame* frame) {
         this->size = size;
         this->device = device;
 
@@ -25,8 +25,8 @@ namespace zvlk {
         uniformBuffersMemory.resize(frame->getImagesNumber());
 
         for (size_t i = 0; i < frame->getImagesNumber(); i++) {
-            device->createBuffer(size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            device->createBuffer(size, vk::BufferUsageFlagBits::eUniformBuffer,
+                    vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
                     uniformBuffers[i], uniformBuffersMemory[i]);
         }
     }
@@ -42,15 +42,12 @@ namespace zvlk {
         this->device->copyMemory(this->size, ubo, this->uniformBuffersMemory[index]);
     }
 
-    VkDeviceSize UniformBuffer::getSize() {
+    vk::DeviceSize UniformBuffer::getSize() {
         return this->size;
     }
 
-    VkDescriptorBufferInfo UniformBuffer::getDescriptorBufferInfo( uint32_t index) {
-        VkDescriptorBufferInfo bufferInfo = {};
-        bufferInfo.buffer = this->uniformBuffers[index];
-        bufferInfo.offset = 0;
-        bufferInfo.range = this->getSize();
+    vk::DescriptorBufferInfo UniformBuffer::getDescriptorBufferInfo( uint32_t index) {
+        vk::DescriptorBufferInfo bufferInfo(this->uniformBuffers[index], 0, this->getSize());
         return bufferInfo;
     }
 

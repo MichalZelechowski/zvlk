@@ -49,7 +49,7 @@ namespace zvlk {
         return this->swapChainExtent.height;
     }
 
-    Frame::Frame(zvlk::Device* device, vk::SurfaceKHR& surface) {
+    Frame::Frame(zvlk::Device* device, vk::SurfaceKHR surface) {
         this->graphicsDevice = device->getGraphicsDevice();
 
         zvlk::SwapChainSupportDetails swapChainSupport = device->querySwapChainSupport(surface);
@@ -66,7 +66,7 @@ namespace zvlk {
         vk::SwapchainCreateInfoKHR createInfo({}, surface, imageCount, surfaceFormat.format, surfaceFormat.colorSpace,
                 extent, 1, vk::ImageUsageFlagBits::eColorAttachment, vk::SharingMode::eExclusive, 0, nullptr,
                 swapChainSupport.capabilities.currentTransform, vk::CompositeAlphaFlagBitsKHR::eOpaque,
-                presentMode, VK_TRUE, VK_NULL_HANDLE);
+                presentMode, VK_TRUE);
 
         std::set<uint32_t> uniqueQueueFamiliesSet = device->findQueueFamilies(surface).getUniqueQueueFamilies();
         std::vector<uint32_t> uniqueQueueFamilies(uniqueQueueFamiliesSet.begin(), uniqueQueueFamiliesSet.end());
@@ -113,7 +113,7 @@ namespace zvlk {
 
         vk::SubpassDependency dependency(VK_SUBPASS_EXTERNAL, 0,
                 vk::PipelineStageFlagBits::eColorAttachmentOutput, vk::PipelineStageFlagBits::eColorAttachmentOutput,
-                0, vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite);
+        {}, vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite);
 
         std::array<vk::AttachmentDescription, 3> attachments = {colorAttachment, depthAttachment, colorAttachmentResolve};
         vk::RenderPassCreateInfo renderPassInfo({},
@@ -153,11 +153,9 @@ namespace zvlk {
             swapChainFramebuffers[i] = this->graphicsDevice.createFramebuffer(framebufferInfo);
         }
 
-        this->clearValues = {vk::ClearValue(vk::ClearColorValue(
-            {1.0f, 0.0f, 0.0f, 1.0f})),
+        this->clearValues = {vk::ClearValue(vk::ClearColorValue(std::array<float,4>({1.0f, 0.0f, 0.0f, 1.0f}))),
             vk::ClearValue(vk::ClearDepthStencilValue(1.0f, 0)),
-            vk::ClearValue(vk::ClearColorValue(
-            {1.0f, 0.0f, 0.0f, 1.0f}))};
+            vk::ClearValue(vk::ClearColorValue(std::array<float,4>({1.0f, 0.0f, 0.0f, 1.0f})))};
     }
 
     vk::SurfaceFormatKHR Frame::chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats) {
@@ -219,7 +217,7 @@ namespace zvlk {
         return this->renderPass;
     }
 
-    vk::RenderPassBeginInfo Frame::getRenderPassBeginInfo(uint32_t index) {
+    vk::RenderPassBeginInfo Frame::getRenderPassBeginInfo(uint32_t index) const {
         vk::RenderPassBeginInfo renderPassInfo(this->renderPass, this->swapChainFramebuffers[index],
                 vk::Rect2D(vk::Offset2D(0, 0), this->swapChainExtent),
                 static_cast<uint32_t> (clearValues.size()),
