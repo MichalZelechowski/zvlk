@@ -1,7 +1,8 @@
 This repository is a training repository, that includes code from the excellent https://vulkan-tutorial.com and other excercises related to learning of Vulkan SDK.
 
-This branch contains object oriented code of vulkan tutorial
-* (https://github.com/MichalZelechowski/zvlk/tree/objectify)
+Branches contain the following:
+* [object oriented code of vulkan tutorial](https://github.com/MichalZelechowski/zvlk/tree/objectify)
+* [vulkan tutorial with Vulkan HPP](https://github.com/MichalZelechowski/zvlk/tree/vulkan_hpp)
 
 From vulkan-tutorial related code:
 * Drawing a triangle

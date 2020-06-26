@@ -8,8 +8,8 @@
 #ifndef VULKAN_H
 #define VULKAN_H
 
-#include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan.hpp>
+#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <vector>
 #include <string>

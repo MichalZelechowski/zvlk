@@ -187,7 +187,7 @@ namespace zvlk {
             callback->update(imageIndex);
         }
 
-        if (!this->imagesInFlight[imageIndex]) {
+        if (this->imagesInFlight[imageIndex]) {
             device.waitForFences(1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
         }
 

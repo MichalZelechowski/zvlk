@@ -135,7 +135,7 @@
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
-        <compilerSet>default</compilerSet>
+        <compilerSet>GNU|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
@@ -148,6 +148,9 @@
             <pElem>include</pElem>
           </incDir>
           <commandLine>-fno-strict-aliasing</commandLine>
+          <preprocessorList>
+            <Elem>NDEBUG</Elem>
+          </preprocessorList>
           <warningLevel>0</warningLevel>
         </ccTool>
         <linkerTool>
