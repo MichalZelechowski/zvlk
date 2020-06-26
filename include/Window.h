@@ -8,20 +8,23 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <string>
 
-#include "WindowCallback.h"
-
 namespace zvlk {
+
+    class WindowCallback {
+    public:
+        virtual void resize(int width, int height) = 0;
+
+    };
 
     class Window {
     public:
         Window(int width, int height, const std::string title, WindowCallback* callback);
         Window(const Window& orig) = delete;
         virtual ~Window();
-        
+
         void waitResize();
         std::tuple<int, int> getSize();
         bool isClosed();

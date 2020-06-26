@@ -8,9 +8,7 @@
 #ifndef FRAME_H
 #define FRAME_H
 
-#define GLFW_INCLUDE_VULKAN
-
-#include <GLFW/glfw3.h>
+#include <vulkan/vulkan.hpp>
 #include <vector>
 #include <array>
 

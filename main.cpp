@@ -1,10 +1,9 @@
-#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#include <vulkan/vulkan.hpp>
 
 #include <iostream>
 
 #include "Window.h"
-#include "WindowCallback.h"
 #include "Vulkan.h"
 #include "Device.h"
 #include "Texture.h"
@@ -72,12 +71,12 @@ private:
     }
 
     int assess(zvlk::Device* device) {
-        const VkPhysicalDeviceProperties& deviceProperties = device->getProperties();
-        const VkPhysicalDeviceFeatures& deviceFeatures = device->getFeatures();
+        const vk::PhysicalDeviceProperties& deviceProperties = device->getProperties();
+        const vk::PhysicalDeviceFeatures& deviceFeatures = device->getFeatures();
 
         int score = 0;
         // Discrete GPUs have a significant performance advantage
-        if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+        if (deviceProperties.deviceType == vk::PhysicalDeviceType::eDiscreteGpu) {
             score += 1000;
         }
 
@@ -130,7 +129,7 @@ private:
             this->engine->execute();
         }
 
-        vkDeviceWaitIdle(device->getGraphicsDevice());
+        device->getGraphicsDevice().waitIdle();
     }
 
     void cleanup() {

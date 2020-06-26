@@ -8,9 +8,7 @@
 #ifndef FRAGMENTSHADER_H
 #define FRAGMENTSHADER_H
 
-#define GLFW_INCLUDE_VULKAN
-
-#include <GLFW/glfw3.h>
+#include <vulkan/vulkan.hpp>
 
 #include "Shader.h"
 
@@ -20,7 +18,7 @@ namespace zvlk {
     public:
         FragmentShader() = delete;
         FragmentShader(const FragmentShader& orig) = delete;
-        FragmentShader(VkDevice device, const char* name);
+        FragmentShader(vk::Device device, const char* name);
         virtual ~FragmentShader();
     private:
 
