@@ -17,7 +17,7 @@ namespace zvlk {
     public:
         VertexShader() = delete;
         VertexShader(const VertexShader& orig) = delete;
-        VertexShader(VkDevice device, const char* name);
+        VertexShader(vk::Device device, const char* name);
         virtual ~VertexShader();
         
         vk::PipelineVertexInputStateCreateInfo& getPipelineVertexInputStateCreateInfo();

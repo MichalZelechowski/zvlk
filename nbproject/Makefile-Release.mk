@@ -47,7 +47,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/VertexShader.o \
 	${OBJECTDIR}/Vulkan.o \
 	${OBJECTDIR}/Window.o \
-	${OBJECTDIR}/WindowCallback.o \
 	${OBJECTDIR}/main.o
 
 
@@ -134,11 +133,6 @@ ${OBJECTDIR}/Window.o: Window.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -w -s -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Window.o Window.cpp
-
-${OBJECTDIR}/WindowCallback.o: WindowCallback.cpp
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -w -s -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/WindowCallback.o WindowCallback.cpp
 
 ${OBJECTDIR}/main.o: main.cpp
 	${MKDIR} -p ${OBJECTDIR}

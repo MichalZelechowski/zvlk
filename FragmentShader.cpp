@@ -13,6 +13,6 @@ namespace zvlk {
     FragmentShader::~FragmentShader() {
     }
 
-    FragmentShader::FragmentShader(VkDevice device, const char* name) : Shader(device, name, VK_SHADER_STAGE_FRAGMENT_BIT) {
+    FragmentShader::FragmentShader(vk::Device device, const char* name) : Shader(device, name, vk::ShaderStageFlagBits::eFragment) {
     }
 }

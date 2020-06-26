@@ -13,7 +13,7 @@
 
 namespace zvlk {
 
-    Shader::Shader(VkDevice device, const char* name, VkShaderStageFlagBits stage) {
+    Shader::Shader(vk::Device device, const char* name, vk::ShaderStageFlagBits stage) {
         this->device = device;
 
         std::ifstream file(name, std::ios::ate | std::ios::binary);
@@ -30,27 +30,15 @@ namespace zvlk {
 
         file.close();
 
-        VkShaderModuleCreateInfo createInfo = {};
-        createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        createInfo.codeSize = buffer.size();
-        createInfo.pCode = reinterpret_cast<const uint32_t*> (buffer.data());
-
-        if (vkCreateShaderModule(device, &createInfo, nullptr, &this->shaderModule) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create shader module!");
-        }
-
-        this->shaderStageInfo = {};
-        this->shaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        this->shaderStageInfo.stage = stage;
-        this->shaderStageInfo.module = this->shaderModule;
-        this->shaderStageInfo.pName = "main";
+        this->shaderModule = this->device.createShaderModule(vk::ShaderModuleCreateInfo({}, buffer.size(), reinterpret_cast<const uint32_t*> (buffer.data())));
+        this->shaderStageInfo = vk::PipelineShaderStageCreateInfo({}, stage, this->shaderModule, "main");
     }
 
     Shader::~Shader() {
-        vkDestroyShaderModule(this->device, this->shaderModule, nullptr);
+        this->device.destroy(this->shaderModule);
     }
     
-    VkPipelineShaderStageCreateInfo& Shader::getPipelineShaderStageCreateInfo() {
+    vk::PipelineShaderStageCreateInfo& Shader::getPipelineShaderStageCreateInfo() {
         return this->shaderStageInfo;
     }
 }

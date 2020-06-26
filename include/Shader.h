@@ -8,8 +8,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
+#include <vulkan/vulkan.hpp>
 
 namespace zvlk {
 
@@ -17,15 +16,15 @@ namespace zvlk {
     protected:
         Shader() = delete;
         Shader(const Shader& orig) = delete;
-        Shader(VkDevice device, const char* name, VkShaderStageFlagBits stage);
+        Shader(vk::Device device, const char* name, vk::ShaderStageFlagBits stage);
         virtual ~Shader();
         
     public:
-        VkPipelineShaderStageCreateInfo& getPipelineShaderStageCreateInfo();
+        vk::PipelineShaderStageCreateInfo& getPipelineShaderStageCreateInfo();
     protected:
-        VkDevice device;
-        VkShaderModule shaderModule;
-        VkPipelineShaderStageCreateInfo shaderStageInfo;
+        vk::Device device;
+        vk::ShaderModule shaderModule;
+        vk::PipelineShaderStageCreateInfo shaderStageInfo;
     };
 }
 #endif /* SHADER_H */
