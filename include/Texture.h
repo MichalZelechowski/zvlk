@@ -8,9 +8,8 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#define GLFW_INCLUDE_VULKAN
+#include <vulkan/vulkan.hpp>
 
-#include <GLFW/glfw3.h>
 #include <string>
 
 namespace zvlk {
@@ -25,14 +24,14 @@ namespace zvlk {
         Texture(Device* device, std::string texturePath);
         virtual ~Texture();
 
-        VkDescriptorImageInfo getDescriptorBufferInfo(uint32_t index);
+        vk::DescriptorImageInfo getDescriptorBufferInfo(uint32_t index);
     private:
-        VkDevice device;
+        vk::Device device;
         uint32_t mipLevels;
-        VkImage image;
-        VkImageView imageView;
-        VkDeviceMemory imageMemory;
-        VkSampler sampler;
+        vk::Image image;
+        vk::ImageView imageView;
+        vk::DeviceMemory imageMemory;
+        vk::Sampler sampler;
     };
 }
 #endif /* TEXTURE_H */

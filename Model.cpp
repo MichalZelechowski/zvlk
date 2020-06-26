@@ -50,15 +50,16 @@ namespace zvlk {
             }
         }
 
-        VkDeviceSize bufferSize = sizeof (this->vertices[0]) * this->vertices.size();
+        vk::DeviceSize bufferSize = sizeof (this->vertices[0]) * this->vertices.size();
 
-        VkBuffer stagingBuffer;
-        VkDeviceMemory stagingBufferMemory;
+        vk::Buffer stagingBuffer;
+        vk::DeviceMemory stagingBufferMemory;
 
         device->copyMemory(bufferSize, vertices.data(), stagingBuffer, stagingBufferMemory);
 
-        device->createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        device->createBuffer(bufferSize, 
+                vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer,
+                vk::MemoryPropertyFlagBits::eDeviceLocal,
                 this->vertexBuffer, this->vertexBufferMemory);
 
         device->copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
@@ -67,8 +68,9 @@ namespace zvlk {
         bufferSize = sizeof (indices[0]) * indices.size();
         device->copyMemory(bufferSize, indices.data(), stagingBuffer, stagingBufferMemory);
 
-        device->createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        device->createBuffer(bufferSize, 
+                vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer,
+                vk::MemoryPropertyFlagBits::eDeviceLocal,
                 this->indexBuffer, this->indexBufferMemory);
 
         device->copyBuffer(stagingBuffer, indexBuffer, bufferSize);

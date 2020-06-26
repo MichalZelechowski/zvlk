@@ -7,10 +7,7 @@
 
 #ifndef VERTEXSHADER_H
 #define VERTEXSHADER_H
-
-#define GLFW_INCLUDE_VULKAN
-
-#include <GLFW/glfw3.h>
+#include <vulkan/vulkan.hpp>
 
 #include "Shader.h"
 
@@ -23,9 +20,9 @@ namespace zvlk {
         VertexShader(VkDevice device, const char* name);
         virtual ~VertexShader();
         
-        VkPipelineVertexInputStateCreateInfo& getPipelineVertexInputStateCreateInfo();
+        vk::PipelineVertexInputStateCreateInfo& getPipelineVertexInputStateCreateInfo();
     private:
-        VkPipelineVertexInputStateCreateInfo vertexInputInfo;
+        vk::PipelineVertexInputStateCreateInfo vertexInputInfo;
     };
 }
 #endif /* VERTEXSHADER_H */
