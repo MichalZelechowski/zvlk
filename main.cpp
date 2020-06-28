@@ -2,6 +2,9 @@
 #include <vulkan/vulkan.hpp>
 
 #include <iostream>
+#include <chrono>
+#include <sstream>
+#include <iomanip>
 
 #include "Window.h"
 #include "Vulkan.h"
@@ -66,7 +69,7 @@ private:
         this->engine->enableShaders(*this->vertexShader, *this->fragmentShader);
         this->engine->draw(*this->model, *this->transformationMatrices, *this->texture);
         this->engine->compile();
-        
+
         this->engine->addCallback(this);
     }
 
@@ -103,30 +106,46 @@ private:
     }
 
     void update(uint32_t frameIndex) {
-        static_cast<zvlk::UniformBuffer*>(this->transformationMatrices)->update(frameIndex);
+        static_cast<zvlk::UniformBuffer*> (this->transformationMatrices)->update(frameIndex);
     }
 
-//    void recreateSwapChain() {
-//        this->window->waitResize();
-//
-//        vkDeviceWaitIdle(this->device->getGraphicsDevice());
-//
-//        cleanupSwapChain();
-//
-//        createGraphicsPipeline();
-//        createColorResources();
-//        createDepthResources();
-//        createFramebuffers();
-//        createUniformBuffers();
-//        createDescriptorPool();
-//        createDescriptorSets();
-//        createCommandBuffers();
-//    }
+    //    void recreateSwapChain() {
+    //        this->window->waitResize();
+    //
+    //        vkDeviceWaitIdle(this->device->getGraphicsDevice());
+    //
+    //        cleanupSwapChain();
+    //
+    //        createGraphicsPipeline();
+    //        createColorResources();
+    //        createDepthResources();
+    //        createFramebuffers();
+    //        createUniformBuffers();
+    //        createDescriptorPool();
+    //        createDescriptorSets();
+    //        createCommandBuffers();
+    //    }
 
     void mainLoop() {
+        auto startTime = std::chrono::high_resolution_clock::now();
+        uint32_t frames = 0;
+        
         while (!window->isClosed()) {
             glfwPollEvents();
             this->engine->execute();
+            
+            auto currentTime = std::chrono::high_resolution_clock::now();
+            float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+            frames = frames+1;
+            
+            std::ostringstream ss;
+            ss << std::fixed << std::setprecision(2) << static_cast<float>(frames) / time << " FPS";
+            glfwSetWindowTitle(this->window->getWindow(), ss.str().data());
+            
+            if (frames == 100) {
+                frames =0 ;
+                startTime = std::chrono::high_resolution_clock::now();
+            }
         }
 
         device->getGraphicsDevice().waitIdle();
