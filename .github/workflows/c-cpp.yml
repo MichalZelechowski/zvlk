@@ -13,11 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: configure
-      run: ./configure
-    - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
+    - name: make debug
+      run: make -j -f Makefile CONF=Debug
+    - name: make release
+      run: make -j -f Makefile CONF=Release
