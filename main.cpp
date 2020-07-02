@@ -5,6 +5,8 @@
 #include <chrono>
 #include <sstream>
 #include <iomanip>
+#include <zip.h>
+#include <fstream>
 
 #include "Window.h"
 #include "Vulkan.h"
@@ -22,7 +24,9 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
-class HelloTriangleApplication : public zvlk::WindowCallback, zvlk::DeviceAssessment, zvlk::EngineCallback {
+const char* MODEL_PATH = "/tmp/train.obj";
+
+class TrainApplication : public zvlk::WindowCallback, zvlk::DeviceAssessment, zvlk::EngineCallback {
 public:
 
     void run() {
@@ -57,7 +61,7 @@ private:
 
         this->texture = new zvlk::Texture(this->device, "viking_room.png");
 
-        this->model = new zvlk::Model(this->device, "viking_room.obj");
+        this->model = new zvlk::Model(this->device, MODEL_PATH);
 
         this->vertexShader = new zvlk::VertexShader(this->device->getGraphicsDevice(), "vert.spv");
         this->fragmentShader = new zvlk::FragmentShader(this->device->getGraphicsDevice(), "frag.spv");
@@ -129,21 +133,21 @@ private:
     void mainLoop() {
         auto startTime = std::chrono::high_resolution_clock::now();
         uint32_t frames = 0;
-        
+
         while (!window->isClosed()) {
             glfwPollEvents();
             this->engine->execute();
-            
+
             auto currentTime = std::chrono::high_resolution_clock::now();
             float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-            frames = frames+1;
-            
+            frames = frames + 1;
+
             std::ostringstream ss;
-            ss << std::fixed << std::setprecision(2) << static_cast<float>(frames) / time << " FPS";
+            ss << std::fixed << std::setprecision(2) << static_cast<float> (frames) / time << " FPS";
             glfwSetWindowTitle(this->window->getWindow(), ss.str().data());
-            
+
             if (frames == 100) {
-                frames =0 ;
+                frames = 0;
                 startTime = std::chrono::high_resolution_clock::now();
             }
         }
@@ -175,8 +179,37 @@ private:
 
 };
 
+int inflateModel(const char* source, const char* dest) {
+    int errorp;
+    zip_t* zipSource = zip_open(source, ZIP_RDONLY, &errorp);
+    if (zipSource == NULL) {
+        return errorp;
+    }
+
+    zip_file_t* sourceFile = zip_fopen(zipSource, "ldm12.obj", ZIP_FL_UNCHANGED);
+
+    zip_stat_t stat;
+    if (zip_stat(zipSource, "ldm12.obj", ZIP_FL_UNCHANGED, &stat) == -1) {
+        return -1;
+    }
+
+    char* buffer = new char[stat.size];
+    if (zip_fread(sourceFile, buffer, stat.size) == -1) {
+        return -1;
+    }
+
+    std::ofstream output(dest, std::ios::out | std::ios::binary);
+    output.write(buffer, stat.size);
+    output.close();
+
+    delete[] buffer;
+    return 0;
+}
+
 int main() {
-    HelloTriangleApplication app;
+    inflateModel("ldm12.zip", MODEL_PATH);
+
+    TrainApplication app;
 
     try {
         app.run();

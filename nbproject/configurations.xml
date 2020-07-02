@@ -57,22 +57,25 @@
   <confs>
     <conf name="Debug" type="1">
       <toolsSet>
-        <compilerSet>default</compilerSet>
+        <compilerSet>GNU|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
         <ccTool>
           <standard>12</standard>
+          <commandlineTool>g++</commandlineTool>
           <incDir>
             <pElem>include</pElem>
           </incDir>
           <warningLevel>2</warningLevel>
         </ccTool>
         <linkerTool>
+          <commandlineTool>g++</commandlineTool>
           <linkerLibItems>
             <linkerOptionItem>`pkg-config --libs vulkan`</linkerOptionItem>
             <linkerOptionItem>`pkg-config --libs glfw3`</linkerOptionItem>
+            <linkerOptionItem>`pkg-config --libs libzip`</linkerOptionItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>
@@ -144,6 +147,7 @@
           <developmentMode>6</developmentMode>
           <stripSymbols>true</stripSymbols>
           <standard>12</standard>
+          <commandlineTool>g++</commandlineTool>
           <incDir>
             <pElem>include</pElem>
           </incDir>
@@ -154,9 +158,11 @@
           <warningLevel>0</warningLevel>
         </ccTool>
         <linkerTool>
+          <commandlineTool>g++</commandlineTool>
           <linkerLibItems>
             <linkerOptionItem>`pkg-config --libs vulkan`</linkerOptionItem>
             <linkerOptionItem>`pkg-config --libs glfw3`</linkerOptionItem>
+            <linkerOptionItem>`pkg-config --libs libzip`</linkerOptionItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>

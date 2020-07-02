@@ -64,7 +64,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=`pkg-config --libs vulkan` `pkg-config --libs glfw3`  
+LDLIBSOPTIONS=`pkg-config --libs vulkan` `pkg-config --libs glfw3` `pkg-config --libs libzip`  
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -72,72 +72,72 @@ LDLIBSOPTIONS=`pkg-config --libs vulkan` `pkg-config --libs glfw3`
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/vulkanstarter: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/vulkanstarter ${OBJECTFILES} ${LDLIBSOPTIONS}
+	g++ -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/vulkanstarter ${OBJECTFILES} ${LDLIBSOPTIONS}
 
 ${OBJECTDIR}/Device.o: Device.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Device.o Device.cpp
+	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Device.o Device.cpp
 
 ${OBJECTDIR}/Engine.o: Engine.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Engine.o Engine.cpp
+	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Engine.o Engine.cpp
 
 ${OBJECTDIR}/FragmentShader.o: FragmentShader.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FragmentShader.o FragmentShader.cpp
+	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FragmentShader.o FragmentShader.cpp
 
 ${OBJECTDIR}/Frame.o: Frame.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Frame.o Frame.cpp
+	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Frame.o Frame.cpp
 
 ${OBJECTDIR}/Model.o: Model.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Model.o Model.cpp
+	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Model.o Model.cpp
 
 ${OBJECTDIR}/Shader.o: Shader.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Shader.o Shader.cpp
+	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Shader.o Shader.cpp
 
 ${OBJECTDIR}/Texture.o: Texture.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Texture.o Texture.cpp
+	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Texture.o Texture.cpp
 
 ${OBJECTDIR}/TransformationMatrices.o: TransformationMatrices.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TransformationMatrices.o TransformationMatrices.cpp
+	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TransformationMatrices.o TransformationMatrices.cpp
 
 ${OBJECTDIR}/UniformBuffer.o: UniformBuffer.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/UniformBuffer.o UniformBuffer.cpp
+	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/UniformBuffer.o UniformBuffer.cpp
 
 ${OBJECTDIR}/VertexShader.o: VertexShader.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/VertexShader.o VertexShader.cpp
+	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/VertexShader.o VertexShader.cpp
 
 ${OBJECTDIR}/Vulkan.o: Vulkan.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Vulkan.o Vulkan.cpp
+	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Vulkan.o Vulkan.cpp
 
 ${OBJECTDIR}/Window.o: Window.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Window.o Window.cpp
+	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Window.o Window.cpp
 
 ${OBJECTDIR}/main.o: main.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
 
 # Subprojects
 .build-subprojects:

@@ -24,31 +24,42 @@ namespace zvlk {
 
         std::unordered_map<Vertex, uint32_t> uniqueVertices{};
 
-        for (const auto& shape : shapes) {
-            for (const auto& index : shape.mesh.indices) {
-                Vertex vertex{};
+        tinyobj::shape_t shape = shapes[0];
+        //        for (const auto& shape : shapes) {
+        for (const auto& index : shape.mesh.indices) {
+            Vertex vertex{};
 
-                vertex.pos = {
-                    attrib.vertices[3 * index.vertex_index + 0],
-                    attrib.vertices[3 * index.vertex_index + 1],
-                    attrib.vertices[3 * index.vertex_index + 2]
-                };
+            vertex.pos = {
+                attrib.vertices[3 * index.vertex_index + 0],
+                attrib.vertices[3 * index.vertex_index + 1],
+                attrib.vertices[3 * index.vertex_index + 2]
+            };
 
-                vertex.texCoord = {
-                    attrib.texcoords[2 * index.texcoord_index + 0],
-                    1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
-                };
+            vertex.texCoord = {
+                attrib.texcoords[2 * index.texcoord_index + 0],
+                1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+            };
 
-                vertex.color = {1.0f, 1.0f, 1.0f};
+            vertex.color = {1.0f, 1.0f, 1.0f};
+            vertex.normal = { 
+                attrib.normals[3 * index.normal_index + 0],
+                attrib.normals[3 * index.normal_index + 1],
+                attrib.normals[3 * index.normal_index + 2]
+            };
 
-                if (uniqueVertices.count(vertex) == 0) {
-                    uniqueVertices[vertex] = static_cast<uint32_t> (this->vertices.size());
-                    this->vertices.push_back(vertex);
-                }
-
-                this->indices.push_back(uniqueVertices[vertex]);
+            if (uniqueVertices.count(vertex) == 0) {
+                uniqueVertices[vertex] = static_cast<uint32_t> (this->vertices.size());
+                this->vertices.push_back(vertex);
             }
+
+            this->indices.push_back(uniqueVertices[vertex]);
         }
+        //        }
+        
+        this->vertexBuffer.push_back(vk::Buffer());
+        this->vertexBufferMemory.push_back(vk::DeviceMemory());
+        this->indexBuffer.push_back(vk::Buffer());
+        this->indexBufferMemory.push_back(vk::DeviceMemory());
 
         vk::DeviceSize bufferSize = sizeof (this->vertices[0]) * this->vertices.size();
 
@@ -57,31 +68,33 @@ namespace zvlk {
 
         device->copyMemory(bufferSize, vertices.data(), stagingBuffer, stagingBufferMemory);
 
-        device->createBuffer(bufferSize, 
+        device->createBuffer(bufferSize,
                 vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer,
                 vk::MemoryPropertyFlagBits::eDeviceLocal,
-                this->vertexBuffer, this->vertexBufferMemory);
+                this->vertexBuffer[0], this->vertexBufferMemory[0]);
 
-        device->copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+        device->copyBuffer(stagingBuffer, vertexBuffer[0], bufferSize);
         device->freeMemory(stagingBuffer, stagingBufferMemory);
 
         bufferSize = sizeof (indices[0]) * indices.size();
         device->copyMemory(bufferSize, indices.data(), stagingBuffer, stagingBufferMemory);
 
-        device->createBuffer(bufferSize, 
+        device->createBuffer(bufferSize,
                 vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer,
                 vk::MemoryPropertyFlagBits::eDeviceLocal,
-                this->indexBuffer, this->indexBufferMemory);
+                this->indexBuffer[0], this->indexBufferMemory[0]);
 
-        device->copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+        device->copyBuffer(stagingBuffer, indexBuffer[0], bufferSize);
         device->freeMemory(stagingBuffer, stagingBufferMemory);
 
         this->device = device;
     }
 
     Model::~Model() {
-        this->device->freeMemory(this->indexBuffer, this->indexBufferMemory);
-        this->device->freeMemory(this->vertexBuffer, this->vertexBufferMemory);
+        for (size_t i = 0; i<this->indexBuffer.size(); i++) {
+            this->device->freeMemory(this->indexBuffer[i], this->indexBufferMemory[i]);
+            this->device->freeMemory(this->vertexBuffer[i], this->vertexBufferMemory[i]);
+        }
     }
 }
 

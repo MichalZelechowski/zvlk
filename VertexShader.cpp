@@ -18,7 +18,7 @@ namespace zvlk {
 
     VertexShader::VertexShader(vk::Device device, const char* name) : Shader(device, name, vk::ShaderStageFlagBits::eVertex) {
         static vk::VertexInputBindingDescription bindingDescription = zvlk::Vertex::getBindingDescription();
-        static std::array<vk::VertexInputAttributeDescription, 3> attributeDescriptions = zvlk::Vertex::getAttributeDescriptions();
+        static std::array<vk::VertexInputAttributeDescription, 4> attributeDescriptions = zvlk::Vertex::getAttributeDescriptions();
 
         this->vertexInputInfo = vk::PipelineVertexInputStateCreateInfo({}, 1, &bindingDescription, 
                 static_cast<uint32_t> (attributeDescriptions.size()), attributeDescriptions.data());

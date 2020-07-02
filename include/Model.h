@@ -27,24 +27,26 @@ namespace zvlk {
         glm::vec3 pos;
         glm::vec3 color;
         glm::vec2 texCoord;
+        glm::vec3 normal;
 
         static vk::VertexInputBindingDescription getBindingDescription() {
             vk::VertexInputBindingDescription bindingDescription(0, sizeof (Vertex), vk::VertexInputRate::eVertex);
             return bindingDescription;
         }
 
-        static std::array<vk::VertexInputAttributeDescription, 3> getAttributeDescriptions() {
-            std::array<vk::VertexInputAttributeDescription, 3> attributeDescriptions = {
+        static std::array<vk::VertexInputAttributeDescription, 4> getAttributeDescriptions() {
+            std::array<vk::VertexInputAttributeDescription, 4> attributeDescriptions = {
                 vk::VertexInputAttributeDescription(0, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, pos)),
                 vk::VertexInputAttributeDescription(1, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, color)),
-                vk::VertexInputAttributeDescription(2, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, texCoord))
+                vk::VertexInputAttributeDescription(2, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, texCoord)),
+                vk::VertexInputAttributeDescription(3, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, normal))
             };
 
             return attributeDescriptions;
         }
 
         bool operator==(const Vertex& other) const {
-            return pos == other.pos && color == other.color && texCoord == other.texCoord;
+            return pos == other.pos && color == other.color && texCoord == other.texCoord && normal == other.normal;
         }
     };
 
@@ -56,11 +58,11 @@ namespace zvlk {
         virtual ~Model();
 
         inline vk::Buffer getVertexBuffer() {
-            return this->vertexBuffer;
+            return this->vertexBuffer[0];
         };
 
         inline vk::Buffer getIndexBuffer() {
-            return this->indexBuffer;
+            return this->indexBuffer[0];
         };
 
         inline uint32_t getNumberOfIndices() {
@@ -70,10 +72,10 @@ namespace zvlk {
         zvlk::Device* device;
         std::vector<Vertex> vertices;
         std::vector<uint32_t> indices;
-        vk::Buffer vertexBuffer;
-        vk::DeviceMemory vertexBufferMemory;
-        vk::Buffer indexBuffer;
-        vk::DeviceMemory indexBufferMemory;
+        std::vector<vk::Buffer> vertexBuffer;
+        std::vector<vk::DeviceMemory> vertexBufferMemory;
+        std::vector<vk::Buffer> indexBuffer;
+        std::vector<vk::DeviceMemory> indexBufferMemory;
     };
 }
 
@@ -84,7 +86,8 @@ namespace std {
         size_t operator()(zvlk::Vertex const& vertex) const {
             return ((hash<glm::vec3>()(vertex.pos) ^
                     (hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
-                    (hash<glm::vec2>()(vertex.texCoord) << 1);
+                    (hash<glm::vec2>()(vertex.texCoord) << 1) ^
+                    (hash<glm::vec3>()(vertex.normal) << 2);
         }
     };
 }
