@@ -72,7 +72,7 @@ namespace zvlk {
         vk::Rect2D scissor(vk::Offset2D(0, 0), vk::Extent2D(frame->getWidth(), frame->getHeight()));
         vk::PipelineViewportStateCreateInfo viewportState({}, 1, &viewport, 1, &scissor);
         vk::PipelineRasterizationStateCreateInfo rasterizer({}, VK_FALSE, VK_FALSE, vk::PolygonMode::eFill,
-                vk::CullModeFlagBits::eNone, vk::FrontFace::eCounterClockwise, VK_FALSE, 0.0f, 0.0f, 0.0f, 1.0f);
+                vk::CullModeFlagBits::eBack, vk::FrontFace::eCounterClockwise, VK_FALSE, 0.0f, 0.0f, 0.0f, 1.0f);
         vk::PipelineMultisampleStateCreateInfo multisampling({}, deviceObject->getMaxUsableSampleCount(),
                 VK_TRUE, 1.0f, nullptr, VK_FALSE, VK_FALSE);
 
@@ -115,7 +115,7 @@ namespace zvlk {
                     &rasterizer, &multisampling, &depthStencil, &colorBlending,{}, unit.pipelineLayout,
                     frame->getRenderPass(), 0, vk::Pipeline(), -1);
 
-            unit.graphicsPipeline = device.createGraphicsPipelines(vk::PipelineCache(), {pipelineInfo})[0];
+            unit.graphicsPipeline = device.createGraphicsPipelines(vk::PipelineCache(),{pipelineInfo})[0];
 
             for (ModelUnit& model : unit.models) {
                 model.descriptorSets = this->device.allocateDescriptorSets(allocInfo);
@@ -133,7 +133,7 @@ namespace zvlk {
                         {})
                     };
 
-                    this->device.updateDescriptorSets(descriptorWrites, {});
+                    this->device.updateDescriptorSets(descriptorWrites,{});
                 }
             }
 
@@ -152,18 +152,18 @@ namespace zvlk {
                 commandBuffers[i].bindPipeline(vk::PipelineBindPoint::eGraphics, unit.graphicsPipeline);
 
                 for (ModelUnit& model : unit.models) {
-                    //objects are bound
-                    //this can be optimized for a range of models
-                    vk::Buffer vertexBuffers[] = {model.model.getVertexBuffer()};
-                    vk::DeviceSize offsets[] = {0};
-                    commandBuffers[i].bindVertexBuffers(0, 1, vertexBuffers, offsets);
-                    commandBuffers[i].bindIndexBuffer(model.model.getIndexBuffer(), 0, vk::IndexType::eUint32);
-                    commandBuffers[i].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, unit.pipelineLayout, 0, 1, &model.descriptorSets[i], 0, nullptr);
-                    //objects are drawn
-                    commandBuffers[i].drawIndexed(model.model.getNumberOfIndices(), 1, 0, 0, 0);
-                    commandBuffers[i].endRenderPass();
+                    for (std::string& name : model.model.getPartNames()) {
+                        vk::Buffer vertexBuffers[] = {model.model.getVertexBuffer(name)};
+                        vk::DeviceSize offsets[] = {0};
+                        commandBuffers[i].bindVertexBuffers(0, 1, vertexBuffers, offsets);
+                        commandBuffers[i].bindIndexBuffer(model.model.getIndexBuffer(name), 0, vk::IndexType::eUint32);
+                        commandBuffers[i].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, unit.pipelineLayout, 0, 1, &model.descriptorSets[i], 0, nullptr);
+                        //objects are drawn
+                        commandBuffers[i].drawIndexed(model.model.getNumberOfIndices(name), 1, 0, 0, 0);
+                    }
                 }
             }
+            commandBuffers[i].endRenderPass();
             commandBuffers[i].end();
         }
     }
@@ -193,7 +193,7 @@ namespace zvlk {
 
         imagesInFlight[imageIndex] = inFlightFences[currentFrame];
         device.resetFences(1, &inFlightFences[currentFrame]);
-        
+
         vk::Semaphore waitSemaphores[] = {imageAvailableSemaphores[currentFrame]};
         vk::PipelineStageFlags waitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
         vk::Semaphore signalSemaphores[] = {renderFinishedSemaphores[currentFrame]};
@@ -204,7 +204,7 @@ namespace zvlk {
         vk::PresentInfoKHR presentInfo(1, signalSemaphores, 1, swapChains, &imageIndex);
         result = this->deviceObject->present(&presentInfo);
 
-        if (result == vk::Result::eErrorOutOfDateKHR|| result == vk::Result::eSuboptimalKHR) {
+        if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
             //|| framebufferResized) {
             std::cout << "VK_SUBOPTIMAL_KHR" << std::endl;
             //framebufferResized = false;
