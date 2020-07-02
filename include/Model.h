@@ -57,25 +57,33 @@ namespace zvlk {
         Model(zvlk::Device* device, const std::string name);
         virtual ~Model();
 
-        inline vk::Buffer getVertexBuffer() {
-            return this->vertexBuffer[0];
+        inline std::vector<std::string> getPartNames() {
+            std::vector<std::string> names = {};
+            for (auto& kv : this->vertices) {
+                names.push_back(kv.first);
+            }
+            return names;
+        }
+        
+        inline vk::Buffer getVertexBuffer(std::string name) {
+            return this->vertexBuffer[name];
         };
 
-        inline vk::Buffer getIndexBuffer() {
-            return this->indexBuffer[0];
+        inline vk::Buffer getIndexBuffer(std::string name) {
+            return this->indexBuffer[name];
         };
 
-        inline uint32_t getNumberOfIndices() {
-            return this->indices.size();
+        inline uint32_t getNumberOfIndices(std::string name) {
+            return this->indices[name].size();
         }
     private:
         zvlk::Device* device;
-        std::vector<Vertex> vertices;
-        std::vector<uint32_t> indices;
-        std::vector<vk::Buffer> vertexBuffer;
-        std::vector<vk::DeviceMemory> vertexBufferMemory;
-        std::vector<vk::Buffer> indexBuffer;
-        std::vector<vk::DeviceMemory> indexBufferMemory;
+        std::unordered_map<std::string, std::vector<Vertex>> vertices;
+        std::unordered_map<std::string, std::vector<uint32_t>> indices;
+        std::unordered_map<std::string, vk::Buffer> vertexBuffer;
+        std::unordered_map<std::string, vk::DeviceMemory> vertexBufferMemory;
+        std::unordered_map<std::string, vk::Buffer> indexBuffer;
+        std::unordered_map<std::string, vk::DeviceMemory> indexBufferMemory;
     };
 }
 
