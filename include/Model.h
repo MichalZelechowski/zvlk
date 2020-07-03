@@ -81,9 +81,9 @@ namespace zvlk {
         std::unordered_map<std::string, std::vector<Vertex>> vertices;
         std::unordered_map<std::string, std::vector<uint32_t>> indices;
         std::unordered_map<std::string, vk::Buffer> vertexBuffer;
-        std::unordered_map<std::string, vk::DeviceMemory> vertexBufferMemory;
         std::unordered_map<std::string, vk::Buffer> indexBuffer;
-        std::unordered_map<std::string, vk::DeviceMemory> indexBufferMemory;
+        vk::DeviceMemory vertexBufferMemory;
+        vk::DeviceMemory indexBufferMemory;
     };
 }
 
