@@ -24,6 +24,9 @@ namespace zvlk {
 
         std::unordered_map<std::string, std::unordered_map<Vertex, uint32_t >> uniqueVertices({});
 
+        vk::DeviceSize vertexBufferSize = 0;
+        vk::DeviceSize indicesBufferSize = 0;
+        vk::DeviceSize maxStagingBufferSize = 0;
         for (const auto& shape : shapes) {
             uniqueVertices[shape.name] = std::unordered_map<Vertex, uint32_t>();
             this->indices[shape.name] = std::vector<uint32_t>();
@@ -59,48 +62,70 @@ namespace zvlk {
                 this->indices[shape.name].push_back(uniqueVertices[shape.name][vertex]);
             }
 
-            this->vertexBuffer[shape.name] = vk::Buffer();
-            this->vertexBufferMemory[shape.name] = vk::DeviceMemory();
-            this->indexBuffer[shape.name] = vk::Buffer();
-            this->indexBufferMemory[shape.name] = vk::DeviceMemory();
-
-            vk::DeviceSize bufferSize = sizeof (this->vertices[shape.name][0]) * this->vertices[shape.name].size();
-
-            vk::Buffer stagingBuffer;
-            vk::DeviceMemory stagingBufferMemory;
-
-            device->copyMemory(bufferSize, vertices[shape.name].data(), stagingBuffer, stagingBufferMemory);
-
-            device->createBuffer(bufferSize,
-                    vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer,
-                    vk::MemoryPropertyFlagBits::eDeviceLocal,
-                    this->vertexBuffer[shape.name], this->vertexBufferMemory[shape.name]);
-
-            device->copyBuffer(stagingBuffer, vertexBuffer[shape.name], bufferSize);
-            device->freeMemory(stagingBuffer, stagingBufferMemory);
-
-            bufferSize = sizeof (indices[shape.name][0]) * indices[shape.name].size();
-            device->copyMemory(bufferSize, indices[shape.name].data(), stagingBuffer, stagingBufferMemory);
-
-            device->createBuffer(bufferSize,
-                    vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer,
-                    vk::MemoryPropertyFlagBits::eDeviceLocal,
-                    this->indexBuffer[shape.name], this->indexBufferMemory[shape.name]);
-
-            device->copyBuffer(stagingBuffer, indexBuffer[shape.name], bufferSize);
-            device->freeMemory(stagingBuffer, stagingBufferMemory);
+            vertexBufferSize += sizeof (this->vertices[shape.name][0]) * this->vertices[shape.name].size();
+            indicesBufferSize += sizeof (this->indices[shape.name][0]) * this->indices[shape.name].size();
+            maxStagingBufferSize = std::max(std::max(maxStagingBufferSize, sizeof (this->vertices[shape.name][0]) * this->vertices[shape.name].size()),
+                    sizeof (this->indices[shape.name][0]) * this->indices[shape.name].size());
         }
 
+        vk::MemoryAllocateInfo vertexAllocationInfo(0, 0);
+        vk::MemoryAllocateInfo indexAllocationInfo(0, 0);
+        for (auto& shape : shapes) {
+            this->vertexBuffer[shape.name] = vk::Buffer();
+            this->indexBuffer[shape.name] = vk::Buffer();
 
+            vk::DeviceSize bufferSize = sizeof (this->vertices[shape.name][0]) * this->vertices[shape.name].size();
+            device->createVertexBuffer(bufferSize, this->vertexBuffer[shape.name]);
+            bufferSize = sizeof (this->indices[shape.name][0]) * this->indices[shape.name].size();
+            device->createIndexBuffer(bufferSize, this->indexBuffer[shape.name]);
+
+            vk::MemoryAllocateInfo ma = device->getMemoryAllocateInfo(this->vertexBuffer[shape.name], vk::MemoryPropertyFlagBits::eDeviceLocal);
+            vertexAllocationInfo.allocationSize += ma.allocationSize;
+            vertexAllocationInfo.memoryTypeIndex = ma.memoryTypeIndex;
+            ma = device->getMemoryAllocateInfo(this->indexBuffer[shape.name], vk::MemoryPropertyFlagBits::eDeviceLocal);
+            indexAllocationInfo.allocationSize += ma.allocationSize;
+            indexAllocationInfo.memoryTypeIndex = ma.memoryTypeIndex;
+        }
+
+        vk::Buffer stagingBuffer;
+        vk::DeviceMemory stagingBufferMemory;
+        device->createStagingBuffer(maxStagingBufferSize, stagingBuffer, stagingBufferMemory);
+
+        device->createDeviceMemory(vertexAllocationInfo, this->vertexBufferMemory);
+        device->createDeviceMemory(indexAllocationInfo, this->indexBufferMemory);
+
+        vk::DeviceSize vertexOffset = 0;
+        vk::DeviceSize indicesOffset = 0;
+        for (auto& shape : shapes) {
+            vk::DeviceSize bufferSize = sizeof (this->vertices[shape.name][0]) * this->vertices[shape.name].size();
+            vk::MemoryAllocateInfo ma = device->getMemoryAllocateInfo(this->vertexBuffer[shape.name], vk::MemoryPropertyFlagBits::eDeviceLocal);
+            device->copyMemory(bufferSize, vertices[shape.name].data(), stagingBufferMemory);
+            device->bindBuffer(vertexBuffer[shape.name], this->vertexBufferMemory, vertexOffset);
+            device->copyBuffer(stagingBuffer, vertexBuffer[shape.name], bufferSize);
+            vertexOffset += ma.allocationSize;
+
+            bufferSize = sizeof (this->indices[shape.name][0]) * this->indices[shape.name].size();
+            ma = device->getMemoryAllocateInfo(this->indexBuffer[shape.name], vk::MemoryPropertyFlagBits::eDeviceLocal);
+            device->copyMemory(bufferSize, indices[shape.name].data(), stagingBufferMemory);
+            device->bindBuffer(indexBuffer[shape.name], this->indexBufferMemory, indicesOffset);
+            device->copyBuffer(stagingBuffer, indexBuffer[shape.name], bufferSize);
+            indicesOffset += ma.allocationSize;
+        }
+
+        device->freeMemory(stagingBuffer, stagingBufferMemory);
         this->device = device;
     }
 
     Model::~Model() {
         std::vector<std::string> names = this->getPartNames();
+        std::vector<vk::Buffer> iB= {};
+        std::vector<vk::Buffer> vB= {};
         for (auto& name : names) {
-            this->device->freeMemory(this->indexBuffer[name], this->indexBufferMemory[name]);
-            this->device->freeMemory(this->vertexBuffer[name], this->vertexBufferMemory[name]);
+            iB.push_back(this->indexBuffer[name]);
+            vB.push_back(this->vertexBuffer[name]);
         }
+        this->device->freeMemory(iB, this->indexBufferMemory);
+        this->device->freeMemory(vB, this->vertexBufferMemory);
     }
 }
 

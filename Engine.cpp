@@ -152,13 +152,12 @@ namespace zvlk {
                 commandBuffers[i].bindPipeline(vk::PipelineBindPoint::eGraphics, unit.graphicsPipeline);
 
                 for (ModelUnit& model : unit.models) {
+                    commandBuffers[i].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, unit.pipelineLayout, 0, 1, &model.descriptorSets[i], 0, nullptr);
                     for (std::string& name : model.model.getPartNames()) {
                         vk::Buffer vertexBuffers[] = {model.model.getVertexBuffer(name)};
                         vk::DeviceSize offsets[] = {0};
                         commandBuffers[i].bindVertexBuffers(0, 1, vertexBuffers, offsets);
                         commandBuffers[i].bindIndexBuffer(model.model.getIndexBuffer(name), 0, vk::IndexType::eUint32);
-                        commandBuffers[i].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, unit.pipelineLayout, 0, 1, &model.descriptorSets[i], 0, nullptr);
-                        //objects are drawn
                         commandBuffers[i].drawIndexed(model.model.getNumberOfIndices(name), 1, 0, 0, 0);
                     }
                 }

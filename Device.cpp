@@ -206,15 +206,39 @@ namespace zvlk {
         this->endSingleTimeCommands(commandBuffer);
     }
 
+    void Device::createVertexBuffer(vk::DeviceSize size, vk::Buffer& buffer) {
+        vk::BufferCreateInfo bufferInfo({}, size,
+                vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer,
+                vk::SharingMode::eExclusive);
+        buffer = this->graphicsDevice.createBuffer(bufferInfo);
+    }
+
+    void Device::createIndexBuffer(vk::DeviceSize size, vk::Buffer& buffer) {
+        vk::BufferCreateInfo bufferInfo({}, size,
+                vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer,
+                vk::SharingMode::eExclusive);
+        buffer = this->graphicsDevice.createBuffer(bufferInfo);
+    }
+
+    vk::MemoryAllocateInfo Device::getMemoryAllocateInfo(vk::Buffer buffer, vk::MemoryPropertyFlags properties) {
+        vk::MemoryRequirements memRequirements = this->graphicsDevice.getBufferMemoryRequirements(buffer);
+        vk::MemoryAllocateInfo allocInfo(memRequirements.size, this->findMemoryType(memRequirements.memoryTypeBits, properties));
+        return allocInfo;
+    }
+
+    void Device::createDeviceMemory(vk::MemoryAllocateInfo info, vk::DeviceMemory& memory) {
+        memory = this->graphicsDevice.allocateMemory(info);
+    }
+
+    void Device::bindBuffer(vk::Buffer& buffer, vk::DeviceMemory& memory, vk::DeviceSize offset) {
+        this->graphicsDevice.bindBufferMemory(buffer, memory, offset);
+    }
+
     void Device::createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Buffer& buffer, vk::DeviceMemory& bufferMemory) {
         vk::BufferCreateInfo bufferInfo({}, size, usage, vk::SharingMode::eExclusive);
         buffer = this->graphicsDevice.createBuffer(bufferInfo);
-
-        vk::MemoryRequirements memRequirements = this->graphicsDevice.getBufferMemoryRequirements(buffer);
-        vk::MemoryAllocateInfo allocInfo(memRequirements.size, this->findMemoryType(memRequirements.memoryTypeBits, properties));
-        bufferMemory = this->graphicsDevice.allocateMemory(allocInfo);
-
-        this->graphicsDevice.bindBufferMemory(buffer, bufferMemory, 0);
+        this->createDeviceMemory(this->getMemoryAllocateInfo(buffer, properties), bufferMemory);
+        this->bindBuffer(buffer, bufferMemory, 0);
     }
 
     void Device::createImage(uint32_t width, uint32_t height, uint32_t mipLevels,
@@ -237,11 +261,15 @@ namespace zvlk {
         return this->graphicsDevice.createImageView(viewInfo);
     }
 
-    void Device::copyMemory(vk::DeviceSize size, void* content, vk::Buffer& stagingBuffer, vk::DeviceMemory& stagingBufferMemory) {
+    void Device::createStagingBuffer(vk::DeviceSize size, vk::Buffer& stagingBuffer, vk::DeviceMemory& stagingBufferMemory) {
         this->createBuffer(size,
                 vk::BufferUsageFlagBits::eTransferSrc,
                 vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
                 stagingBuffer, stagingBufferMemory);
+    }
+
+    void Device::copyMemory(vk::DeviceSize size, void* content, vk::Buffer& stagingBuffer, vk::DeviceMemory& stagingBufferMemory) {
+        this->createStagingBuffer(size, stagingBuffer, stagingBufferMemory);
         this->copyMemory(size, content, stagingBufferMemory);
     }
 
@@ -251,17 +279,28 @@ namespace zvlk {
         this->graphicsDevice.unmapMemory(memory);
     }
 
-    void Device::copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size) {
+    void Device::copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size, vk::DeviceSize dstOffset) {
         vk::CommandBuffer commandBuffer = this->beginSingleTimeCommands();
 
-        vk::BufferCopy copyRegion(0, 0, size);
+        vk::BufferCopy copyRegion(0, dstOffset, size);
         commandBuffer.copyBuffer(srcBuffer, dstBuffer, 1, &copyRegion);
 
         this->endSingleTimeCommands(commandBuffer);
     }
+    
+    void Device::copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size) {
+        this->copyBuffer(srcBuffer, dstBuffer, size, 0);
+    }
 
     void Device::freeMemory(vk::Buffer buffer, vk::DeviceMemory memory) {
         this->graphicsDevice.destroy(buffer);
+        this->graphicsDevice.freeMemory(memory);
+    }
+
+    void Device::freeMemory(std::vector<vk::Buffer> buffers, vk::DeviceMemory memory) {
+        for (vk::Buffer& buffer : buffers) {
+            this->graphicsDevice.destroy(buffer);
+        }
         this->graphicsDevice.freeMemory(memory);
     }
 

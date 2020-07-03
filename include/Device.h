@@ -76,11 +76,19 @@ namespace zvlk {
                 vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage,
                 vk::MemoryPropertyFlags properties, vk::Image& image, vk::DeviceMemory& imageMemory);
         void createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Buffer& buffer, vk::DeviceMemory& bufferMemory);
+        void bindBuffer(vk::Buffer& buffer, vk::DeviceMemory& memory, vk::DeviceSize offset);
+        void createVertexBuffer(vk::DeviceSize size, vk::Buffer& buffer);
+        void createIndexBuffer(vk::DeviceSize size, vk::Buffer& buffer);
+        void createStagingBuffer(vk::DeviceSize size, vk::Buffer& stagingBuffer, vk::DeviceMemory& stagingBufferMemory);
+        void createDeviceMemory(vk::MemoryAllocateInfo info, vk::DeviceMemory& memory);
+        vk::MemoryAllocateInfo getMemoryAllocateInfo(vk::Buffer buffer, vk::MemoryPropertyFlags properties);
         void copyMemory(vk::DeviceSize size, void* content, vk::Buffer& buffer, vk::DeviceMemory& memory);
         void copyMemory(vk::DeviceSize size, void* content, vk::DeviceMemory& memory);
         void copyBufferToImage(vk::Buffer buffer, vk::Image image, uint32_t width, uint32_t height);
         void freeMemory(vk::Buffer buffer, vk::DeviceMemory memory);
+        void freeMemory(std::vector<vk::Buffer> buffers, vk::DeviceMemory memory);
         void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size);
+        void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size, vk::DeviceSize dstOffset);
         void freeCommandBuffers(std::vector<vk::CommandBuffer>& commandBuffers);
         vk::CommandBuffer beginSingleTimeCommands();
         void endSingleTimeCommands(vk::CommandBuffer commandBuffer);
