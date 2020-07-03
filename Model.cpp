@@ -18,55 +18,11 @@ namespace zvlk {
         std::vector<tinyobj::material_t> materials;
         std::string warn, err;
 
-        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, name.c_str())) {
+        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, name.c_str(), "/tmp/")) {
             throw std::runtime_error(warn + err);
         }
 
-        std::unordered_map<std::string, std::unordered_map<Vertex, uint32_t>> uniqueVertices({});
-        
-        glm::vec3 black = {0.2f, 0.2f, 0.2f};
-        glm::vec3 red = {1.0f, 0.0f, 0.0f};
-        glm::vec3 white = {1.0f, 1.0f, 1.0f};
-        glm::vec3 grey = {0.7f, 0.7f, 0.7f};
-        glm::vec3 yellow = {0.8f, 0.8f, 0.2f};
-        std::unordered_map<std::string, glm::vec3> colors({
-            {"Brake_arms_001", black},
-            {"Brake_pipes_001", red},
-            {"Cabin_001", black},
-            {"Crank_001", red},
-            {"Diesel_motor_001", black},
-            {"Driving_wheels_1_001", red},
-            {"Driving_whees2_001", red},
-            {"Frame_001", red},
-            {"Loco_coupler_bar_001", black},
-            {"Loco_coupler_bar_002", black},
-            {"Loco_coupler_hook_001", black},
-            {"Loco_coupler_hook_002", black},
-            {"Wagon_coupler_link1_002", black},
-            {"Wagon_coupler_link2_003", black},
-            {"Loco_coupler_link2_003", black},
-            {"Loco_coupler_link_002", black},
-            {"Loco_coupler_link_001", black},
-            {"Loco_coupler_link2_001", black},
-            {"Plates_001", white},
-            {"Plates_003", white},
-            {"Side_rod_001", red},
-            {"Side_rod_003", red},
-            {"Tracks_001", grey},
-            {"Wagon_body_001", yellow},
-            {"Wagon_coupler_hook_001", black},
-            {"Wagon_coupler_link1_001", black},
-            {"Wagon_coupler_bar_001", black},
-            {"Wagon_coupler_link2_001", black},
-            {"Wagon_coupler_bar_002", black},
-            {"Wagon_door1_001", yellow},
-            {"Wagon_door2_001", yellow},
-            {"Wagon_door2_002", yellow},
-            {"Wagon_door1_003", yellow},
-            {"Wagon_wheel_001", grey},
-            {"Wagon_wheel_002", grey},
-        });
-        
+        std::unordered_map<std::string, std::unordered_map<Vertex, uint32_t >> uniqueVertices({});
 
         for (const auto& shape : shapes) {
             uniqueVertices[shape.name] = std::unordered_map<Vertex, uint32_t>();
@@ -86,7 +42,9 @@ namespace zvlk {
                     1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
                 };
 
-                vertex.color = colors[shape.name];
+                vertex.color = {materials[shape.mesh.material_ids[0]].diffuse[0],
+                    materials[shape.mesh.material_ids[0]].diffuse[1],
+                    materials[shape.mesh.material_ids[0]].diffuse[2]};
                 vertex.normal = {
                     attrib.normals[3 * index.normal_index + 0],
                     attrib.normals[3 * index.normal_index + 1],

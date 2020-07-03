@@ -24,7 +24,7 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
-const char* MODEL_PATH = "/tmp/train.obj";
+const char* MODEL_PATH = "/tmp/ldm12.obj";
 
 class TrainApplication : public zvlk::WindowCallback, zvlk::DeviceAssessment, zvlk::EngineCallback {
 public:
@@ -179,35 +179,37 @@ private:
 
 };
 
-int inflateModel(const char* source, const char* dest) {
+int inflateModel(std::string source, std::string dest) {
     int errorp;
-    zip_t* zipSource = zip_open(source, ZIP_RDONLY, &errorp);
+    zip_t* zipSource = zip_open((source + ".zip").data(), ZIP_RDONLY, &errorp);
     if (zipSource == NULL) {
         return errorp;
     }
 
-    zip_file_t* sourceFile = zip_fopen(zipSource, "ldm12.obj", ZIP_FL_UNCHANGED);
+    for (auto ext :{".obj", ".mtl"}) {
+        zip_file_t* sourceFile = zip_fopen(zipSource, (source + ext).data(), ZIP_FL_UNCHANGED);
 
-    zip_stat_t stat;
-    if (zip_stat(zipSource, "ldm12.obj", ZIP_FL_UNCHANGED, &stat) == -1) {
-        return -1;
+        zip_stat_t stat;
+        if (zip_stat(zipSource, (source + ext).data(), ZIP_FL_UNCHANGED, &stat) == -1) {
+            return -1;
+        }
+
+        char* buffer = new char[stat.size];
+        if (zip_fread(sourceFile, buffer, stat.size) == -1) {
+            return -1;
+        }
+
+        std::ofstream output((dest+source+ext).data(), std::ios::out | std::ios::binary);
+        output.write(buffer, stat.size);
+        output.close();
+
+        delete[] buffer;
     }
-
-    char* buffer = new char[stat.size];
-    if (zip_fread(sourceFile, buffer, stat.size) == -1) {
-        return -1;
-    }
-
-    std::ofstream output(dest, std::ios::out | std::ios::binary);
-    output.write(buffer, stat.size);
-    output.close();
-
-    delete[] buffer;
     return 0;
 }
 
 int main() {
-    inflateModel("ldm12.zip", MODEL_PATH);
+    inflateModel("ldm12", "/tmp/");
 
     TrainApplication app;
 
