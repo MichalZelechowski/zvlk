@@ -29,6 +29,9 @@ namespace zvlk {
             this->device.destroy(unit.pipelineLayout);
             this->device.destroy(unit.descriptorPool);
             this->device.destroy(unit.descriptorSetLayout);
+            for (ModelUnit& model : unit.models) {
+                model.descriptorSets.clear();
+            }
         }
     }
 
@@ -205,7 +208,6 @@ namespace zvlk {
         result = this->deviceObject->present(&presentInfo);
 
         if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR || framebufferResized) {
-            std::cout << "VK_SUBOPTIMAL_KHR" << std::endl;
             return false;
         } else if (result != vk::Result::eSuccess) {
             std::cout << "Swap chain other" << std::endl;

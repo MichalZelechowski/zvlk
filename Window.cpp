@@ -14,7 +14,16 @@ namespace zvlk {
         glfwInit(); //TODO remove to some other init
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+//          FOR full screen mode
+//        int monitorCount;
+//        GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
+//        const GLFWvidmode* mode = glfwGetVideoMode(monitors[0]);
+//
+//        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+//        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+//        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+//        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
         this->window = glfwCreateWindow(width, height, title.data(), nullptr, nullptr);
         this->callback = callback;
@@ -48,11 +57,11 @@ namespace zvlk {
         glfwGetFramebufferSize(this->window, &width, &height);
         return std::make_tuple(width, height);
     }
-    
+
     bool Window::isClosed() {
         return glfwWindowShouldClose(this->window);
     }
-    
+
     GLFWwindow *Window::getWindow() const {
         return this->window;
     }

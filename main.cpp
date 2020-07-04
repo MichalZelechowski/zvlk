@@ -121,11 +121,9 @@ private:
 
         this->frame->destroy();
         this->engine->clean();
-        this->transformationMatrices->destroy();
         
         this->frame->create(this->device, this->vulkan->getSurface());
         this->engine->compile();
-        this->transformationMatrices->create(frame);
         
         this->framebufferResized = false;
     }
