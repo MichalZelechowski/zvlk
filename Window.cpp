@@ -15,21 +15,12 @@ namespace zvlk {
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-//          FOR full screen mode
-//        int monitorCount;
-//        GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
-//        const GLFWvidmode* mode = glfwGetVideoMode(monitors[0]);
-//
-//        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-//        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-//        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-//        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-
         this->window = glfwCreateWindow(width, height, title.data(), nullptr, nullptr);
         this->callback = callback;
 
         glfwSetWindowUserPointer(window, this);
         glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+        glfwSetKeyCallback(window, keyCallback);
     }
 
     Window::~Window() {
@@ -42,6 +33,12 @@ namespace zvlk {
         Window* vlkWindow = reinterpret_cast<Window*> (glfwGetWindowUserPointer(window));
 
         vlkWindow->callback->resize(width, height);
+    }
+    
+    void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+        Window* vlkWindow = reinterpret_cast<Window*> (glfwGetWindowUserPointer(window));
+
+        vlkWindow->callback->key(key, action, mods);
     }
 
     void Window::waitResize() {

@@ -16,6 +16,7 @@ namespace zvlk {
     class WindowCallback {
     public:
         virtual void resize(int width, int height) = 0;
+        virtual void key(int key, int action, int mods) = 0;
 
     };
 
@@ -31,7 +32,7 @@ namespace zvlk {
         GLFWwindow *getWindow() const;
 
         static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
-
+        static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
     private:
         GLFWwindow *window;
         WindowCallback *callback;
