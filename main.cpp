@@ -184,21 +184,7 @@ private:
         this->lastKey = key;
 
         if (key == GLFW_KEY_F && action == GLFW_PRESS) {
-            GLFWmonitor *currentMonitor = glfwGetWindowMonitor(window->getWindow());
-            if (currentMonitor) {
-                const GLFWvidmode* mode = glfwGetVideoMode(currentMonitor);
-                glfwSetWindowMonitor(window->getWindow(), nullptr, 0, 0, 800, 600, mode->refreshRate);
-            } else {
-                int monitorCount;
-                GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
-                const GLFWvidmode* mode = glfwGetVideoMode(monitors[0]);
-
-                glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-                glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-                glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-                glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-                glfwSetWindowMonitor(window->getWindow(), monitors[0], 0, 0, mode->width, mode->height, mode->refreshRate);
-            }
+            window->toggleFullscreen();
         }
 
     }

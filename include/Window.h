@@ -30,7 +30,7 @@ namespace zvlk {
         std::tuple<int, int> getSize();
         bool isClosed();
         GLFWwindow *getWindow() const;
-
+        void toggleFullscreen();
         static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
         static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
     private:
