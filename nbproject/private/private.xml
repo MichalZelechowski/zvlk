@@ -7,29 +7,17 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group name="Vulkan">
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/VertexShader.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Device.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Frame.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Model.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/FragmentShader.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/nbproject/configurations.xml</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/main.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/TransformationMatrices.h</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Model.h</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/TransformationMatrices.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Device.h</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Window.h</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/nbproject/Makefile-Release.mk</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Vulkan.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/UniformBuffer.h</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Vulkan.h</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/shader.vert</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/UniformBuffer.cpp</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/main.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Engine.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Shader.cpp</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Model.h</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Device.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Engine.h</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Frame.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Window.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Texture.h</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Texture.cpp</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/shader.frag</file>
         </group>
     </open-files>
 </project-private>

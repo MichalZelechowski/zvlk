@@ -58,6 +58,7 @@ private:
         this->device = this->vulkan->getDevice(this);
 
         this->frame = this->vulkan->initializeDeviceForGraphics(this->device);
+        this->frame->attachWindow(this->window);
 
         this->texture = new zvlk::Texture(this->device, "viking_room.png");
 
@@ -113,22 +114,21 @@ private:
         static_cast<zvlk::UniformBuffer*> (this->transformationMatrices)->update(frameIndex);
     }
 
-    //    void recreateSwapChain() {
-    //        this->window->waitResize();
-    //
-    //        vkDeviceWaitIdle(this->device->getGraphicsDevice());
-    //
-    //        cleanupSwapChain();
-    //
-    //        createGraphicsPipeline();
-    //        createColorResources();
-    //        createDepthResources();
-    //        createFramebuffers();
-    //        createUniformBuffers();
-    //        createDescriptorPool();
-    //        createDescriptorSets();
-    //        createCommandBuffers();
-    //    }
+    void recreateSwapChain() {
+        this->window->waitResize();
+
+        this->device->getGraphicsDevice().waitIdle();
+
+        this->frame->destroy();
+        this->engine->clean();
+        this->transformationMatrices->destroy();
+        
+        this->frame->create(this->device, this->vulkan->getSurface());
+        this->engine->compile();
+        this->transformationMatrices->create(frame);
+        
+        this->framebufferResized = false;
+    }
 
     void mainLoop() {
         auto startTime = std::chrono::high_resolution_clock::now();
@@ -136,7 +136,11 @@ private:
 
         while (!window->isClosed()) {
             glfwPollEvents();
-            this->engine->execute();
+            vk::Bool32 needSwapChainRecreate = !this->engine->execute(this->framebufferResized);
+            
+            if (needSwapChainRecreate) {
+                this->recreateSwapChain();
+            }
 
             auto currentTime = std::chrono::high_resolution_clock::now();
             float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();

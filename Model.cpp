@@ -91,7 +91,7 @@ namespace zvlk {
         vk::DeviceMemory stagingBufferMemory;
         device->createStagingBuffer(maxStagingBufferSize, stagingBuffer, stagingBufferMemory);
 
-        device->createDeviceMemory(vertexAllocationInfo, this->vertexBufferMemory);
+            device->createDeviceMemory(vertexAllocationInfo, this->vertexBufferMemory);
         device->createDeviceMemory(indexAllocationInfo, this->indexBufferMemory);
 
         vk::DeviceSize vertexOffset = 0;

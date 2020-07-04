@@ -12,15 +12,24 @@
 namespace zvlk {
 
     UniformBuffer::~UniformBuffer() {
+        this->destroy();
+    }
+    
+    void UniformBuffer::destroy() {
         for (size_t i = 0; i < uniformBuffers.size(); i++) {
             this->device->freeMemory(uniformBuffers[i], uniformBuffersMemory[i]);
         }
+        uniformBuffers.clear();
+        uniformBuffersMemory.clear();
     }
 
     UniformBuffer::UniformBuffer(zvlk::Device* device, vk::DeviceSize size, zvlk::Frame* frame) {
         this->size = size;
         this->device = device;
-
+        this->create(frame);
+    }
+    
+    void UniformBuffer::create(zvlk::Frame* frame) {
         uniformBuffers.resize(frame->getImagesNumber());
         uniformBuffersMemory.resize(frame->getImagesNumber());
 

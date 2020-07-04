@@ -17,6 +17,10 @@
 namespace zvlk {
 
     Frame::~Frame() {
+        this->destroy();
+    }
+    
+    void Frame::destroy() {
         for (auto imageView : this->swapChainImageViews) {
             this->graphicsDevice.destroy(imageView);
         }
@@ -51,7 +55,10 @@ namespace zvlk {
 
     Frame::Frame(zvlk::Device* device, vk::SurfaceKHR surface) {
         this->graphicsDevice = device->getGraphicsDevice();
-
+        this->create(device, surface);
+    }
+    
+    void Frame::create(zvlk::Device* device, vk::SurfaceKHR surface) {
         zvlk::SwapChainSupportDetails swapChainSupport = device->querySwapChainSupport(surface);
 
         vk::SurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
@@ -202,9 +209,8 @@ namespace zvlk {
         if (capabilities.currentExtent.width != UINT32_MAX) {
             return capabilities.currentExtent;
         } else {
-            // TODO this is clearly related to window, has to hook it up somehow
-            //std::tuple<int, int> t = this->window->getSize()
-            vk::Extent2D actualExtent(800, 600);
+            std::tuple<int, int> t = this->window->getSize();
+            vk::Extent2D actualExtent(std::get<0>(t),std::get<1>(t));
 
             actualExtent.setWidth(std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, actualExtent.width)));
             actualExtent.setHeight(std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, actualExtent.height)));

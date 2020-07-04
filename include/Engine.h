@@ -49,7 +49,8 @@ namespace zvlk {
         Engine(const Engine& orig) = delete;
         Engine(zvlk::Frame* frame, zvlk::Device* deviceObject);
         virtual ~Engine();
-
+        
+        void clean();
         inline void addCallback(EngineCallback* callback) {
             this->callbacks.push_back(callback);
         };
@@ -57,7 +58,7 @@ namespace zvlk {
         void enableShaders(zvlk::VertexShader& vertexShader, zvlk::FragmentShader& fragmentShader);
         void draw(zvlk::Model& model, zvlk::TransformationMatrices& transformationMatrices, zvlk::Texture& texture);
         void compile();
-        void execute();
+        vk::Bool32 execute(vk::Bool32 framebufferResized);
     private:
         std::list<ExecutionUnit> units;
         std::vector<vk::CommandBuffer> commandBuffers;

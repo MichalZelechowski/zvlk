@@ -58,10 +58,8 @@ namespace zvlk {
             delete device;
         }
 
-        if (this->surface) {
-            this->instance.destroySurfaceKHR(this->surface);
-        }
-
+        this->destroySurface();
+        
         if (this->debug) {
             vk::DispatchLoaderDynamic dldy;
             dldy.init(this->instance);
@@ -69,6 +67,13 @@ namespace zvlk {
         }
 
         this->instance.destroy();
+    }
+
+    void Vulkan::destroySurface() {
+        if (this->surface) {
+            this->instance.destroySurfaceKHR(this->surface);
+            this->surface = vk::SurfaceKHR();
+        }
     }
 
     void Vulkan::addSurface(zvlk::Window* window) {

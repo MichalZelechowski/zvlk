@@ -18,7 +18,10 @@ namespace zvlk {
             this->device.destroy(imageAvailableSemaphores[i]);
             this->device.destroy(inFlightFences[i]);
         }
+        this->clean();
+    }
 
+    void Engine::clean() {
         this->deviceObject->freeCommandBuffers(commandBuffers);
 
         for (ExecutionUnit& unit : this->units) {
@@ -167,17 +170,15 @@ namespace zvlk {
         }
     }
 
-    void Engine::execute() {
+    vk::Bool32 Engine::execute(vk::Bool32 framebufferResized) {
         this->device.waitForFences(1, &this->inFlightFences[this->currentFrame], VK_TRUE, UINT64_MAX);
 
         uint32_t imageIndex;
-        vk::Result result = this->device.acquireNextImageKHR(this->frame->getShwapChain(), UINT64_MAX,
+        vk::Result result = this->device.acquireNextImageKHR(this->frame->getSwapChain(), UINT64_MAX,
                 this->imageAvailableSemaphores[this->currentFrame], vk::Fence(), &imageIndex);
 
         if (result == vk::Result::eErrorOutOfDateKHR) {
-            //recreateSwapChain();
-            std::cout << "VK_ERROR_OUT_OF_DATE_KHR" << std::endl;
-            return;
+            return false;
         } else if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR) {
             throw std::runtime_error("failed to acquire swap chain image!");
         }
@@ -199,21 +200,19 @@ namespace zvlk {
         vk::SubmitInfo submitInfo(1, waitSemaphores, waitStages, 1, &commandBuffers[imageIndex], 1, signalSemaphores);
         this->deviceObject->submitGraphics(&submitInfo, inFlightFences[currentFrame]);
 
-        vk::SwapchainKHR swapChains[] = {this->frame->getShwapChain()};
+        vk::SwapchainKHR swapChains[] = {this->frame->getSwapChain()};
         vk::PresentInfoKHR presentInfo(1, signalSemaphores, 1, swapChains, &imageIndex);
         result = this->deviceObject->present(&presentInfo);
 
-        if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
-            //|| framebufferResized) {
+        if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR || framebufferResized) {
             std::cout << "VK_SUBOPTIMAL_KHR" << std::endl;
-            //framebufferResized = false;
-            //recreateSwapChain();
-            //throw std::runtime_error("result on present is wrong!");
+            return false;
         } else if (result != vk::Result::eSuccess) {
             std::cout << "Swap chain other" << std::endl;
             throw std::runtime_error("failed to present swap chain image!");
         }
 
         currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+        return true;
     }
 }

@@ -13,6 +13,7 @@
 #include <array>
 
 #include "Device.h"
+#include "Window.h"
 
 namespace zvlk {
 
@@ -26,18 +27,26 @@ namespace zvlk {
         Frame(const Frame& orig) = delete;
         virtual ~Frame();
 
+        void create(zvlk::Device* device, vk::SurfaceKHR surface);
+        void destroy();
+
+        inline void attachWindow(zvlk::Window* window) {
+            this->window = window;
+        }
+
         zvlk::SwapChainSupportDetails querySwapChainSupport(vk::SurfaceKHR surface, const vk::Device graphicsDevice);
         uint32_t getImagesNumber();
         uint32_t getWidth();
         uint32_t getHeight();
         vk::RenderPass getRenderPass();
 
-        inline vk::SwapchainKHR getShwapChain() const{
+        inline vk::SwapchainKHR getSwapChain() const {
             return this->swapChain;
         };
-        
+
         vk::RenderPassBeginInfo getRenderPassBeginInfo(uint32_t index) const;
     private:
+        zvlk::Window* window;
         vk::Device graphicsDevice;
 
         vk::SwapchainKHR swapChain;

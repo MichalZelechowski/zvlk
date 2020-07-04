@@ -32,13 +32,18 @@ namespace zvlk {
         Vulkan(bool debug, std::string applicationName);
         Vulkan(const Vulkan& orig) = delete;
         virtual ~Vulkan();
-
+        
         void addSurface(zvlk::Window* window);
+        void destroySurface();
         zvlk::Device* getDevice(zvlk::DeviceAssessment* assessment);
         zvlk::Frame* initializeDeviceForGraphics(zvlk::Device* device);
         bool doesDeviceSupportExtensions(zvlk::Device* device);
         bool doesDeviceSupportGraphics(zvlk::Device* device);
         zvlk::SwapChainSupportDetails querySwapChainSupport(zvlk::Device* device);
+        
+        inline vk::SurfaceKHR getSurface() {
+            return this->surface;
+        }
 
         vk::SurfaceKHR surface;
         vk::Instance instance;

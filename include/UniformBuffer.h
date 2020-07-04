@@ -21,7 +21,9 @@ namespace zvlk {
         UniformBuffer(const UniformBuffer& orig) = delete;
         UniformBuffer(zvlk::Device* device, vk::DeviceSize size, zvlk::Frame* frame);
         virtual ~UniformBuffer();
-
+        
+        void create(zvlk::Frame* frame);
+        void destroy();
         void update(uint32_t index);
         vk::DeviceSize getSize();
         vk::DescriptorBufferInfo getDescriptorBufferInfo(uint32_t frame);
