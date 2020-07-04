@@ -76,6 +76,7 @@
             <linkerOptionItem>`pkg-config --libs vulkan`</linkerOptionItem>
             <linkerOptionItem>`pkg-config --libs glfw3`</linkerOptionItem>
             <linkerOptionItem>`pkg-config --libs libzip`</linkerOptionItem>
+            <linkerOptionItem>`pkg-config --libs glm`</linkerOptionItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>
@@ -163,6 +164,7 @@
             <linkerOptionItem>`pkg-config --libs vulkan`</linkerOptionItem>
             <linkerOptionItem>`pkg-config --libs glfw3`</linkerOptionItem>
             <linkerOptionItem>`pkg-config --libs libzip`</linkerOptionItem>
+            <linkerOptionItem>`pkg-config --libs glm`</linkerOptionItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>
