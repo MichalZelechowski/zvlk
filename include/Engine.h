@@ -16,6 +16,7 @@
 #include "Model.h"
 #include "Texture.h"
 #include "TransformationMatrices.h"
+#include "Camera.h"
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -54,6 +55,10 @@ namespace zvlk {
         inline void addCallback(EngineCallback* callback) {
             this->callbacks.push_back(callback);
         };
+        
+        inline void setCamera(zvlk::Camera *camera) {
+            this->camera = camera;
+        }
 
         void enableShaders(zvlk::VertexShader& vertexShader, zvlk::FragmentShader& fragmentShader);
         void draw(zvlk::Model& model, zvlk::TransformationMatrices& transformationMatrices, zvlk::Texture& texture);
@@ -66,6 +71,7 @@ namespace zvlk {
         uint32_t frameNumber;
         zvlk::Frame* frame;
         zvlk::Device* deviceObject;
+        zvlk::Camera* camera;
 
         std::vector<vk::Semaphore> imageAvailableSemaphores;
         std::vector<vk::Semaphore> renderFinishedSemaphores;

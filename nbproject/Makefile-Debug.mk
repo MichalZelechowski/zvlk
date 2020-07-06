@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/Camera.o \
 	${OBJECTDIR}/Device.o \
 	${OBJECTDIR}/Engine.o \
 	${OBJECTDIR}/FragmentShader.o \
@@ -73,6 +74,11 @@ LDLIBSOPTIONS=`pkg-config --libs vulkan` `pkg-config --libs glfw3` `pkg-config -
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/vulkanstarter: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	g++ -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/vulkanstarter ${OBJECTFILES} ${LDLIBSOPTIONS}
+
+${OBJECTDIR}/Camera.o: Camera.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` `pkg-config --cflags glm` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Camera.o Camera.cpp
 
 ${OBJECTDIR}/Device.o: Device.cpp
 	${MKDIR} -p ${OBJECTDIR}

@@ -97,14 +97,16 @@ namespace zvlk {
                 unit.fragmentShader.getPipelineShaderStageCreateInfo()
             };
 
-            vk::DescriptorSetLayoutBinding uboLayoutBinding(0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex);
-            vk::DescriptorSetLayoutBinding samplerLayoutBinding(1, vk::DescriptorType::eCombinedImageSampler, 1, vk::ShaderStageFlagBits::eFragment);
-            std::array<vk::DescriptorSetLayoutBinding, 2> bindings = {uboLayoutBinding, samplerLayoutBinding};
+            vk::DescriptorSetLayoutBinding cameraBinding(0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex);
+            vk::DescriptorSetLayoutBinding transformationBinding(1, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex);
+            vk::DescriptorSetLayoutBinding samplerLayoutBinding(2, vk::DescriptorType::eCombinedImageSampler, 1, vk::ShaderStageFlagBits::eFragment);
+            std::array<vk::DescriptorSetLayoutBinding, 3> bindings = {cameraBinding, transformationBinding, samplerLayoutBinding};
 
             vk::DescriptorSetLayoutCreateInfo layoutInfo({}, static_cast<uint32_t> (bindings.size()), bindings.data());
             unit.descriptorSetLayout = this->device.createDescriptorSetLayout(layoutInfo);
 
-            std::array<vk::DescriptorPoolSize, 2> poolSizes = {
+            std::array<vk::DescriptorPoolSize, 3> poolSizes = {
+                vk::DescriptorPoolSize(vk::DescriptorType::eUniformBuffer, this->frameNumber),
                 vk::DescriptorPoolSize(vk::DescriptorType::eUniformBuffer, this->frameNumber),
                 vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler, this->frameNumber)
             };
@@ -126,15 +128,20 @@ namespace zvlk {
             for (ModelUnit& model : unit.models) {
                 model.descriptorSets = this->device.allocateDescriptorSets(allocInfo);
                 for (size_t j = 0; j < this->frameNumber; j++) {
+                    vk::DescriptorBufferInfo cameraInfo = this->camera->getDescriptorBufferInfo(j);
                     vk::DescriptorBufferInfo matrixInfo = model.matrix.getDescriptorBufferInfo(j);
                     vk::DescriptorImageInfo textureInfo = model.texture.getDescriptorBufferInfo(j);
 
-                    std::array<vk::WriteDescriptorSet, 2> descriptorWrites = {
+                    std::array<vk::WriteDescriptorSet, 3> descriptorWrites = {
                         vk::WriteDescriptorSet(model.descriptorSets[j],
                         0, 0, 1, vk::DescriptorType::eUniformBuffer,
+                        {}, &cameraInfo,
+                        {}),
+                        vk::WriteDescriptorSet(model.descriptorSets[j],
+                        1, 0, 1, vk::DescriptorType::eUniformBuffer,
                         {}, &matrixInfo,
                         {}),
-                        vk::WriteDescriptorSet(model.descriptorSets[j], 1, 0, 1, vk::DescriptorType::eCombinedImageSampler, &textureInfo,
+                        vk::WriteDescriptorSet(model.descriptorSets[j], 2, 0, 1, vk::DescriptorType::eCombinedImageSampler, &textureInfo,
                         {},
                         {})
                     };

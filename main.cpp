@@ -17,6 +17,7 @@
 #include "FragmentShader.h"
 #include "TransformationMatrices.h"
 #include "Engine.h"
+#include "Camera.h"
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -46,6 +47,7 @@ private:
     zvlk::FragmentShader *fragmentShader;
     zvlk::TransformationMatrices *transformationMatrices;
     zvlk::Engine* engine;
+    zvlk::Camera* camera;
     int lastKey = 0;
 
 
@@ -68,10 +70,12 @@ private:
         this->vertexShader = new zvlk::VertexShader(this->device->getGraphicsDevice(), "vert.spv");
         this->fragmentShader = new zvlk::FragmentShader(this->device->getGraphicsDevice(), "frag.spv");
 
+        this->camera = new zvlk::Camera(device, frame, glm::vec3(500.0f, 500.0f, 500.0f),
+                glm::vec3(0.0f, 0.0f, 0.0f), 45.0f, glm::vec3(0.0f, 0.0f, 1.0f), 0.1f, 2500.0f);
         this->transformationMatrices = new zvlk::TransformationMatrices(this->device, this->frame);
 
         this->engine = new zvlk::Engine(this->frame, this->device);
-
+        this->engine->setCamera(this->camera);
         this->engine->enableShaders(*this->vertexShader, *this->fragmentShader);
         this->engine->draw(*this->model, *this->transformationMatrices, *this->texture);
         this->engine->compile();
@@ -113,6 +117,7 @@ private:
 
     void update(uint32_t frameIndex) {
         static_cast<zvlk::UniformBuffer*> (this->transformationMatrices)->update(frameIndex);
+        static_cast<zvlk::UniformBuffer*> (this->camera)->update(frameIndex);
     }
 
     void recreateSwapChain() {
@@ -164,6 +169,7 @@ private:
         delete this->vertexShader;
         delete this->fragmentShader;
 
+        delete this->camera;
         delete this->transformationMatrices;
         delete this->model;
 

@@ -16,14 +16,11 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 namespace zvlk {
 
     struct TransformationMatricesUBO {
         glm::mat4 model;
-        glm::mat4 view;
-        glm::mat4 proj;
     };
 
     class TransformationMatrices : public UniformBuffer {
@@ -36,7 +33,6 @@ namespace zvlk {
         void* update(uint32_t index, float time);
     private:
         std::vector<TransformationMatricesUBO> ubos;
-        zvlk::Frame* frame;
     };
 }
 #endif /* TRANSFORMATIONMATRICES_H */
