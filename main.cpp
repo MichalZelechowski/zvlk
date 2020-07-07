@@ -116,6 +116,12 @@ private:
     }
 
     void update(uint32_t frameIndex) {
+        if (this->lastKey ==GLFW_KEY_A) {
+            this->camera->rotateEye(1.0f);
+        } else if (this->lastKey == GLFW_KEY_D) {
+            this->camera->rotateEye(-1.0f);
+        }
+
         static_cast<zvlk::UniformBuffer*> (this->transformationMatrices)->update(frameIndex);
         static_cast<zvlk::UniformBuffer*> (this->camera)->update(frameIndex);
     }
@@ -191,6 +197,8 @@ private:
 
         if (key == GLFW_KEY_F && action == GLFW_PRESS) {
             window->toggleFullscreen();
+        } else if ((key == GLFW_KEY_A || key == GLFW_KEY_D) && action == GLFW_RELEASE) {
+            this->lastKey = 0;
         }
 
     }

@@ -29,6 +29,8 @@ namespace zvlk {
         virtual ~Camera();
 
         virtual void* update(uint32_t index, float time);
+        
+        void rotateEye(float angle, glm::vec3 axis=glm::vec3(0.0f, 0.0f, 1.0f));
     private:
         glm::vec3 eye;
         glm::vec3 center;

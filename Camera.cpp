@@ -8,6 +8,7 @@
 #include "Camera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/vec4.hpp>
 
 namespace zvlk {
 
@@ -26,5 +27,9 @@ namespace zvlk {
         this->ubos[index].proj[1][1] *= -1;
 
         return &this->ubos[index];
+    }
+    
+    void Camera::rotateEye(float angle, glm::vec3 axis) {
+        eye = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis) * glm::vec4(eye, 1.0f);
     }
 }
