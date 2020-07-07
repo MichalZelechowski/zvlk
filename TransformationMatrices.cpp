@@ -16,15 +16,23 @@ namespace zvlk {
 
     TransformationMatrices::TransformationMatrices(zvlk::Device* device, zvlk::Frame* frame) : UniformBuffer(device, sizeof (TransformationMatricesUBO), frame) {
         this->ubos.resize(frame->getImagesNumber());
+        this->current = glm::mat4(1.0f);
     }
 
     void* TransformationMatrices::update(uint32_t index, float time) {
-        this->ubos[index].model = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        this->ubos[index].model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -250.0f, 0.0f)) * this->ubos[index].model;
-        this->ubos[index].model = glm::rotate(glm::mat4(1.0f), 0.0f * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)) * this->ubos[index].model;
-
+        this->ubos[index].model = glm::mat4(this->current);
         return &this->ubos[index];
     }
-    
+
+    TransformationMatrices& TransformationMatrices::rotate(float angleDegrees, glm::vec3 direction) {
+        this->current = glm::rotate(glm::mat4(1.0f), glm::radians(angleDegrees), direction) * this->current;
+        return *this;
+    }
+
+    TransformationMatrices& TransformationMatrices::translate(glm::vec3 vector) {
+        this->current = glm::translate(glm::mat4(1.0f), vector) * this->current;
+        return *this;
+    }
+
 }
 

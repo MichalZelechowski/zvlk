@@ -73,7 +73,8 @@ private:
         this->camera = new zvlk::Camera(device, frame, glm::vec3(500.0f, 500.0f, 500.0f),
                 glm::vec3(0.0f, 0.0f, 0.0f), 45.0f, glm::vec3(0.0f, 0.0f, 1.0f), 0.1f, 2500.0f);
         this->transformationMatrices = new zvlk::TransformationMatrices(this->device, this->frame);
-
+        this->transformationMatrices->rotate(90, glm::vec3(1.0f, 0.0f, 0.0f))
+                .translate(glm::vec3(0.0f, -250.0f, 0.0f));
         this->engine = new zvlk::Engine(this->frame, this->device);
         this->engine->setCamera(this->camera);
         this->engine->enableShaders(*this->vertexShader, *this->fragmentShader);
@@ -116,10 +117,14 @@ private:
     }
 
     void update(uint32_t frameIndex) {
-        if (this->lastKey ==GLFW_KEY_A) {
+        if (this->lastKey == GLFW_KEY_A) {
             this->camera->rotateEye(1.0f);
         } else if (this->lastKey == GLFW_KEY_D) {
             this->camera->rotateEye(-1.0f);
+        } else if (this->lastKey == GLFW_KEY_W) {
+            this->transformationMatrices->translate(glm::vec3(0.0f, -1.0f, 0.0f));
+        } else if (this->lastKey == GLFW_KEY_S) {
+            this->transformationMatrices->translate(glm::vec3(0.0f, 1.0f, 0.0f));
         }
 
         static_cast<zvlk::UniformBuffer*> (this->transformationMatrices)->update(frameIndex);
@@ -197,7 +202,8 @@ private:
 
         if (key == GLFW_KEY_F && action == GLFW_PRESS) {
             window->toggleFullscreen();
-        } else if ((key == GLFW_KEY_A || key == GLFW_KEY_D) && action == GLFW_RELEASE) {
+        } else if ((key == GLFW_KEY_A || key == GLFW_KEY_D || key == GLFW_KEY_W || key == GLFW_KEY_S)
+                && action == GLFW_RELEASE) {
             this->lastKey = 0;
         }
 

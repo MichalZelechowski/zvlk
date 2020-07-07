@@ -29,10 +29,14 @@ namespace zvlk {
         TransformationMatrices(const TransformationMatrices& orig) = delete;
         TransformationMatrices(zvlk::Device* device, zvlk::Frame* frame);
         virtual ~TransformationMatrices();
+        
+        TransformationMatrices& rotate(float angleDegrees, glm::vec3 direction);
+        TransformationMatrices& translate(glm::vec3 vector);
     protected:
         void* update(uint32_t index, float time);
     private:
         std::vector<TransformationMatricesUBO> ubos;
+        glm::mat4 current;
     };
 }
 #endif /* TRANSFORMATIONMATRICES_H */
