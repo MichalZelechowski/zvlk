@@ -48,8 +48,7 @@ private:
     zvlk::TransformationMatrices *transformationMatrices;
     zvlk::Engine* engine;
     zvlk::Camera* camera;
-    int lastKey = 0;
-
+    std::set<int> lastKeys;
 
     bool framebufferResized = false;
 
@@ -117,13 +116,13 @@ private:
     }
 
     void update(uint32_t frameIndex) {
-        if (this->lastKey == GLFW_KEY_A) {
+        if (this->lastKeys.count(GLFW_KEY_A)) {
             this->camera->rotateEye(1.0f);
-        } else if (this->lastKey == GLFW_KEY_D) {
+        } else if (this->lastKeys.count(GLFW_KEY_D)) {
             this->camera->rotateEye(-1.0f);
-        } else if (this->lastKey == GLFW_KEY_W) {
+        } else if (this->lastKeys.count(GLFW_KEY_W)) {
             this->transformationMatrices->translate(glm::vec3(0.0f, -1.0f, 0.0f));
-        } else if (this->lastKey == GLFW_KEY_S) {
+        } else if (this->lastKeys.count(GLFW_KEY_S)) {
             this->transformationMatrices->translate(glm::vec3(0.0f, 1.0f, 0.0f));
         }
 
@@ -149,7 +148,7 @@ private:
         auto startTime = std::chrono::high_resolution_clock::now();
         uint32_t frames = 0;
 
-        while (!window->isClosed() && lastKey != GLFW_KEY_Q) {
+        while (!window->isClosed() && lastKeys.count(GLFW_KEY_Q) == 0) {
             glfwPollEvents();
             vk::Bool32 needSwapChainRecreate = !this->engine->execute(this->framebufferResized);
 
@@ -198,13 +197,13 @@ private:
     }
 
     void key(int key, int action, int mods) {
-        this->lastKey = key;
+        this->lastKeys.insert(key);
 
         if (key == GLFW_KEY_F && action == GLFW_PRESS) {
             window->toggleFullscreen();
         } else if ((key == GLFW_KEY_A || key == GLFW_KEY_D || key == GLFW_KEY_W || key == GLFW_KEY_S)
                 && action == GLFW_RELEASE) {
-            this->lastKey = 0;
+            this->lastKeys.erase(key);
         }
 
     }
