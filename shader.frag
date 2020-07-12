@@ -7,6 +7,11 @@ layout(location = 2) in vec3 inNormal;
 
 layout(location = 0) out vec4 outColor;
 
+layout(set = 0, binding = 0) uniform CameraUbo {
+    mat4 view;
+    mat4 proj;
+} cameraUbo;
+
 layout(set = 2, binding = 0) uniform sampler2D texSampler;
 layout(set = 2, binding = 1) uniform MaterialUbo {
     vec4 ambient;
@@ -18,7 +23,7 @@ layout(set = 2, binding = 1) uniform MaterialUbo {
 void main() {
     vec3 lightPosition = vec3(1000.0, 1000.0, 1000.0);
     vec4 lightColor = vec4(1.0, 1.0, 1.0, 1.0);
-    vec3 cameraPosition = vec3(1000.0, 1000.0, 1000.0);
+    vec3 cameraPosition = cameraUbo.view[3].xyz;
 
     //diffuse
     vec3 normal = normalize(inNormal);
@@ -31,5 +36,5 @@ void main() {
     float specular = pow(max(dot(viewDirection, reflectDirection), 0.0), materialUbo.shiness);  
 
     //total
-    outColor = vec4(materialUbo.ambient.rgb + diffuse * materialUbo.diffuse.rgb + specular * materialUbo.specular.rgb, 1.0) * lightColor;
+    outColor = vec4(0.1 * materialUbo.ambient.rgb + diffuse * materialUbo.diffuse.rgb + specular * materialUbo.specular.rgb, 1.0) * lightColor;
 }
