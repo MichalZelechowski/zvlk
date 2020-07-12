@@ -18,6 +18,7 @@ namespace zvlk {
             this->ubos[i].diffuse = diffuse;
             this->ubos[i].specular = specular;
             this->ubos[i].shiness = shiness;
+            dynamic_cast<UniformBuffer*>(this)->update(i);
         }
     }
 

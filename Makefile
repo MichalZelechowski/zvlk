@@ -55,6 +55,7 @@ build: .build-post
 
 .build-pre:
 # Add your pre 'build' code here...
+	bash compile.bash
 
 .build-post: .build-impl
 # Add your post 'build' code here...
@@ -67,8 +68,7 @@ clean: .clean-post
 # Add your pre 'clean' code here...
 
 .clean-post: .clean-impl
-# Add your post 'clean' code here...
-
+	rm *.spv
 
 # clobber
 clobber: .clobber-post

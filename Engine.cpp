@@ -237,6 +237,7 @@ namespace zvlk {
                         commandBuffers[i].bindVertexBuffers(0, 1, vertexBuffers, offsets);
                         commandBuffers[i].bindIndexBuffer(model.model.getIndexBuffer(name), 0, vk::IndexType::eUint32);
                         commandBuffers[i].drawIndexed(model.model.getNumberOfIndices(name), 1, 0, 0, 0);
+                        k++;
                     }
                     j++;
                 }
