@@ -13,23 +13,24 @@
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/FragmentShader.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/shader.vert</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/main.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/TransformationMatrices.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Model.h</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/TransformationMatrices.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Device.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Window.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/shader.frag</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Camera.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Vulkan.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/UniformBuffer.h</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Material.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/UniformBuffer.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Engine.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Shader.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Engine.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Frame.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Camera.cpp</file>
-            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Texture.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Window.cpp</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/TransformationMatrices.h</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/TransformationMatrices.cpp</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Device.h</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/UniformBuffer.h</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Material.h</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Engine.cpp</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Texture.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Texture.h</file>
         </group>
     </open-files>

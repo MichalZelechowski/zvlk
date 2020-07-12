@@ -20,12 +20,13 @@
 #include <array>
 
 #include "Device.h"
+#include "Frame.h"
+#include "Material.h"
 
 namespace zvlk {
 
     struct Vertex {
-        glm::vec3 pos;
-        glm::vec3 color;
+        glm::vec3 position;
         glm::vec2 texCoord;
         glm::vec3 normal;
 
@@ -34,19 +35,18 @@ namespace zvlk {
             return bindingDescription;
         }
 
-        static std::array<vk::VertexInputAttributeDescription, 4> getAttributeDescriptions() {
-            std::array<vk::VertexInputAttributeDescription, 4> attributeDescriptions = {
-                vk::VertexInputAttributeDescription(0, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, pos)),
-                vk::VertexInputAttributeDescription(1, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, color)),
-                vk::VertexInputAttributeDescription(2, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, texCoord)),
-                vk::VertexInputAttributeDescription(3, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, normal))
+        static std::array<vk::VertexInputAttributeDescription, 3> getAttributeDescriptions() {
+            std::array<vk::VertexInputAttributeDescription, 3> attributeDescriptions = {
+                vk::VertexInputAttributeDescription(0, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, position)),
+                vk::VertexInputAttributeDescription(1, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, texCoord)),
+                vk::VertexInputAttributeDescription(2, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, normal))
             };
 
             return attributeDescriptions;
         }
 
         bool operator==(const Vertex& other) const {
-            return pos == other.pos && color == other.color && texCoord == other.texCoord && normal == other.normal;
+            return position == other.position && texCoord == other.texCoord && normal == other.normal;
         }
     };
 
@@ -54,14 +54,10 @@ namespace zvlk {
     public:
         Model() = delete;
         Model(const Model& orig) = delete;
-        Model(zvlk::Device* device, const std::string name);
+        Model(zvlk::Device* device, const std::string name, zvlk::Frame* frame);
         virtual ~Model();
 
         inline std::vector<std::string> getPartNames() {
-            std::vector<std::string> names = {};
-            for (auto& kv : this->vertices) {
-                names.push_back(kv.first);
-            }
             return names;
         }
         
@@ -76,8 +72,16 @@ namespace zvlk {
         inline uint32_t getNumberOfIndices(std::string name) {
             return this->indices[name].size();
         }
+        
+        inline zvlk::Material* getMaterial(uint32_t index) {
+            return this->materialMapping[this->names[index]];
+        }
+        
     private:
         zvlk::Device* device;
+        std::vector<zvlk::Material*> materials;
+        std::vector<std::string> names;
+        std::unordered_map<std::string, Material*> materialMapping;
         std::unordered_map<std::string, std::vector<Vertex>> vertices;
         std::unordered_map<std::string, std::vector<uint32_t>> indices;
         std::unordered_map<std::string, vk::Buffer> vertexBuffer;
@@ -92,10 +96,9 @@ namespace std {
     template<> struct hash<zvlk::Vertex> {
 
         size_t operator()(zvlk::Vertex const& vertex) const {
-            return ((hash<glm::vec3>()(vertex.pos) ^
-                    (hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
+            return ((hash<glm::vec3>()(vertex.position) ^
                     (hash<glm::vec2>()(vertex.texCoord) << 1) ^
-                    (hash<glm::vec3>()(vertex.normal) << 2);
+                    (hash<glm::vec3>()(vertex.normal) << 2)));
         }
     };
 }

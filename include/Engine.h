@@ -26,16 +26,16 @@ namespace zvlk {
         zvlk::Model& model;
         zvlk::Texture& texture;
         zvlk::TransformationMatrices& matrix;
+        vk::DescriptorPool descriptorPool;
         std::vector<vk::DescriptorSet> descriptorSets;
     } ModelUnit;
 
     typedef struct ExecutionUnit {
         zvlk::VertexShader& vertexShader;
         zvlk::FragmentShader& fragmentShader;
-        vk::DescriptorSetLayout descriptorSetLayout;
         vk::DescriptorPool descriptorPool;
+        std::vector<vk::DescriptorSet> descriptorSets;
         std::list<ModelUnit> models;
-        vk::PipelineLayout pipelineLayout;
         vk::Pipeline graphicsPipeline;
     } ExecutionUnit;
 
@@ -73,6 +73,13 @@ namespace zvlk {
         zvlk::Device* deviceObject;
         zvlk::Camera* camera;
 
+        vk::DescriptorSetLayout sceneLayout;
+        vk::DescriptorSetLayout modelLayout;
+        vk::DescriptorSetLayout materialLayout;
+        vk::DescriptorPool descriptorPool;
+        std::vector<vk::DescriptorSet> descriptorSets;
+        vk::PipelineLayout pipelineLayout;
+        
         std::vector<vk::Semaphore> imageAvailableSemaphores;
         std::vector<vk::Semaphore> renderFinishedSemaphores;
         std::vector<vk::Fence> inFlightFences;

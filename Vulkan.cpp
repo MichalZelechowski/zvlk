@@ -37,12 +37,17 @@ namespace zvlk {
                     debugCallback);
             createInfo.setPNext(&debugCreateInfo);
 
+            vk::DebugReportCallbackCreateInfoEXT debugReportCreateInfo(
+                    vk::DebugReportFlagBitsEXT::eDebug | vk::DebugReportFlagBitsEXT::eError | vk::DebugReportFlagBitsEXT::eInformation | vk::DebugReportFlagBitsEXT::eWarning | vk::DebugReportFlagBitsEXT::ePerformanceWarning,
+                    debugReportCallback);
+
             this->instance = vk::createInstance(createInfo);
 
             vk::DispatchLoaderDynamic dldy;
             dldy.init(instance);
 
             this->debugMessenger = this->instance.createDebugUtilsMessengerEXT(debugCreateInfo, nullptr, dldy);
+            this->debugReportCallbackExt = this->instance.createDebugReportCallbackEXT(debugReportCreateInfo, nullptr, dldy);
         } else {
             this->instance = vk::createInstance(createInfo);
         }
@@ -59,11 +64,12 @@ namespace zvlk {
         }
 
         this->destroySurface();
-        
+
         if (this->debug) {
             vk::DispatchLoaderDynamic dldy;
             dldy.init(this->instance);
             this->instance.destroyDebugUtilsMessengerEXT(this->debugMessenger, nullptr, dldy);
+            this->instance.destroyDebugReportCallbackEXT(this->debugReportCallbackExt, nullptr, dldy);
         }
 
         this->instance.destroy();
@@ -115,6 +121,7 @@ namespace zvlk {
 
         if (this->debug) {
             extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+            extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
         }
 
         std::cout << "Extensions: " << std::endl;
@@ -131,16 +138,35 @@ namespace zvlk {
             const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
             void* pUserData) {
 
-        std::cerr << std::hex << messageSeverity;
-        std::cerr << " Validation layer: ";
-        std::cerr << std::hex << messageType;
-        std::cerr << " [" << pCallbackData->pMessageIdName << "] " << pCallbackData->pMessage << std::endl;
-        for (uint32_t i = 0; i < pCallbackData->objectCount; ++i) {
-            const char* objectName = pCallbackData->pObjects[i].pObjectName == nullptr ? "" : pCallbackData->pObjects[i].pObjectName;
-            std::cerr << i << " object " << pCallbackData->pObjects[i].objectType;
-            std::cerr << " " << objectName << std::endl;
-        }
+        //        std::cerr << std::hex << messageSeverity;
+        //        std::cerr << " Validation layer: ";
+        //        std::cerr << std::hex << messageType;
+        //        std::cerr << " [" << pCallbackData->pMessageIdName << "] " << pCallbackData->pMessage << std::endl;
+        //        for (uint32_t i = 0; i < pCallbackData->objectCount; ++i) {
+        //            const char* objectName = pCallbackData->pObjects[i].pObjectName == nullptr ? "" : pCallbackData->pObjects[i].pObjectName;
+        //            std::cerr << i << " object " << pCallbackData->pObjects[i].objectType;
+        //            std::cerr << " " << objectName << std::endl;
+        //        }
 
+        return VK_FALSE;
+    }
+
+    VKAPI_ATTR VkBool32 VKAPI_CALL Vulkan::debugReportCallback(
+            VkDebugReportFlagsEXT flags,
+            VkDebugReportObjectTypeEXT objectType,
+            uint64_t object,
+            size_t location,
+            int32_t messageCode,
+            const char* pLayerPrefix,
+            const char* pMessage,
+            void* pUserData) {
+        vk::DebugReportFlagsEXT flagsObject(flags);
+
+        std::cout << vk::to_string(flagsObject);
+        std::cout << '[' << objectType << ']';
+        std::cout << '[' << messageCode << ']';
+        std::cout << '[' << pLayerPrefix << ']';
+        std::cout << " " << pMessage << std::endl;
         return VK_FALSE;
     }
 

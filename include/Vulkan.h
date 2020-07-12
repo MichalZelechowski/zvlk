@@ -32,7 +32,7 @@ namespace zvlk {
         Vulkan(bool debug, std::string applicationName);
         Vulkan(const Vulkan& orig) = delete;
         virtual ~Vulkan();
-        
+
         void addSurface(zvlk::Window* window);
         void destroySurface();
         zvlk::Device* getDevice(zvlk::DeviceAssessment* assessment);
@@ -40,7 +40,7 @@ namespace zvlk {
         bool doesDeviceSupportExtensions(zvlk::Device* device);
         bool doesDeviceSupportGraphics(zvlk::Device* device);
         zvlk::SwapChainSupportDetails querySwapChainSupport(zvlk::Device* device);
-        
+
         inline vk::SurfaceKHR getSurface() {
             return this->surface;
         }
@@ -51,7 +51,8 @@ namespace zvlk {
         std::vector<zvlk::Device*> devices;
         bool debug;
         vk::DebugUtilsMessengerEXT debugMessenger;
-
+        vk::DebugReportCallbackEXT debugReportCallbackExt;
+        
         const std::vector<const char*> validationLayers = {
             //    "VK_LAYER_KHRONOS_validation"
             "VK_LAYER_LUNARG_standard_validation"
@@ -68,6 +69,16 @@ namespace zvlk {
                 VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                 VkDebugUtilsMessageTypeFlagsEXT messageType,
                 const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+                void* pUserData);
+
+        static VKAPI_ATTR VkBool32 VKAPI_CALL debugReportCallback(
+                VkDebugReportFlagsEXT flags,
+                VkDebugReportObjectTypeEXT objectType,
+                uint64_t object,
+                size_t location,
+                int32_t messageCode,
+                const char* pLayerPrefix,
+                const char* pMessage,
                 void* pUserData);
 
     };

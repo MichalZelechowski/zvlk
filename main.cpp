@@ -64,7 +64,7 @@ private:
 
         this->texture = new zvlk::Texture(this->device, "viking_room.png");
 
-        this->model = new zvlk::Model(this->device, MODEL_PATH);
+        this->model = new zvlk::Model(this->device, MODEL_PATH, this->frame);
 
         this->vertexShader = new zvlk::VertexShader(this->device->getGraphicsDevice(), "vert.spv");
         this->fragmentShader = new zvlk::FragmentShader(this->device->getGraphicsDevice(), "frag.spv");

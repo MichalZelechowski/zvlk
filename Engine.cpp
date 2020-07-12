@@ -26,13 +26,20 @@ namespace zvlk {
 
         for (ExecutionUnit& unit : this->units) {
             this->device.destroy(unit.graphicsPipeline);
-            this->device.destroy(unit.pipelineLayout);
             this->device.destroy(unit.descriptorPool);
-            this->device.destroy(unit.descriptorSetLayout);
+            unit.descriptorSets.clear();
             for (ModelUnit& model : unit.models) {
                 model.descriptorSets.clear();
+                this->device.destroy(model.descriptorPool);
             }
         }
+        this->descriptorSets.clear();
+        this->device.destroy(this->pipelineLayout);
+        this->device.destroy(this->descriptorPool);
+
+        this->device.destroy(this->sceneLayout);
+        this->device.destroy(this->modelLayout);
+        this->device.destroy(this->materialLayout);
     }
 
     Engine::Engine(zvlk::Frame* frame, zvlk::Device* deviceObject) {
@@ -58,8 +65,10 @@ namespace zvlk {
     }
 
     void Engine::enableShaders(VertexShader& vertexShader, FragmentShader& fragmentShader) {
-        this->units.push_back({vertexShader, fragmentShader, nullptr, nullptr,
-            {}});
+        this->units.push_back({vertexShader, fragmentShader,
+            nullptr,
+            {},
+            {}, nullptr});
     }
 
     void Engine::draw(Model& model, TransformationMatrices& transformationMatrices, Texture& texture) {
@@ -91,63 +100,113 @@ namespace zvlk {
         }, 0.0f, 1.0f);
 
         int i = 0;
+
+        //per scene
+        vk::DescriptorSetLayoutBinding cameraBinding(0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex);
+        //per model
+        vk::DescriptorSetLayoutBinding transformationBinding(0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex);
+        //per material
+        vk::DescriptorSetLayoutBinding samplerLayoutBinding(0, vk::DescriptorType::eCombinedImageSampler, 1, vk::ShaderStageFlagBits::eFragment);
+        vk::DescriptorSetLayoutBinding materialBinding(1, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eFragment);
+
+        std::array<vk::DescriptorSetLayoutBinding, 4> descriptorSetLayoutBindings = {cameraBinding, transformationBinding, samplerLayoutBinding, materialBinding};
+
+        vk::DescriptorSetLayoutCreateInfo sceneLayoutInfo({}, 1, &descriptorSetLayoutBindings.data()[0]);
+        this->sceneLayout = this->device.createDescriptorSetLayout(sceneLayoutInfo);
+        vk::DescriptorSetLayoutCreateInfo modelLayoutInfo({}, 1, &descriptorSetLayoutBindings.data()[1]);
+        this->modelLayout = this->device.createDescriptorSetLayout(modelLayoutInfo);
+        vk::DescriptorSetLayoutCreateInfo materialLayoutInfo({}, 2, &descriptorSetLayoutBindings.data()[2]);
+        this->materialLayout = this->device.createDescriptorSetLayout(materialLayoutInfo);
+
+        vk::DescriptorPoolSize scenePoolSize(vk::DescriptorType::eUniformBuffer, this->frameNumber);
+        vk::DescriptorPoolCreateInfo poolInfo({}, this->frameNumber, 1, &scenePoolSize);
+        this->descriptorPool = this->device.createDescriptorPool(poolInfo);
+
+        std::vector<vk::DescriptorSetLayout> layouts(this->frameNumber, this->sceneLayout);
+        vk::DescriptorSetAllocateInfo allocInfo(this->descriptorPool, this->frameNumber, layouts.data());
+        this->descriptorSets = this->device.allocateDescriptorSets(allocInfo);
+
+        std::vector<vk::DescriptorSetLayout> descriptorSetLayouts = {this->sceneLayout, this->modelLayout, this->materialLayout};
+        this->pipelineLayout = this->device.createPipelineLayout(vk::PipelineLayoutCreateInfo({}, descriptorSetLayouts.size(), descriptorSetLayouts.data()));
+
+        std::vector<vk::WriteDescriptorSet> descriptorWrites;
+        std::vector<vk::DescriptorBufferInfo> cameraInfos(this->frameNumber);
+        for (size_t j = 0; j < this->frameNumber; j++) {
+            cameraInfos[j] = this->camera->getDescriptorBufferInfo(j);
+            descriptorWrites.push_back(vk::WriteDescriptorSet(this->descriptorSets[j],
+                    0, 0, 1, vk::DescriptorType::eUniformBuffer,{}, &cameraInfos[j],{}));
+        }
+        this->device.updateDescriptorSets(descriptorWrites,{});
+
         for (ExecutionUnit& unit : this->units) {
             vk::PipelineShaderStageCreateInfo shaderStages[] = {
                 unit.vertexShader.getPipelineShaderStageCreateInfo(),
                 unit.fragmentShader.getPipelineShaderStageCreateInfo()
             };
 
-            vk::DescriptorSetLayoutBinding cameraBinding(0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex);
-            vk::DescriptorSetLayoutBinding transformationBinding(1, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex);
-            vk::DescriptorSetLayoutBinding samplerLayoutBinding(2, vk::DescriptorType::eCombinedImageSampler, 1, vk::ShaderStageFlagBits::eFragment);
-            std::array<vk::DescriptorSetLayoutBinding, 3> bindings = {cameraBinding, transformationBinding, samplerLayoutBinding};
-
-            vk::DescriptorSetLayoutCreateInfo layoutInfo({}, static_cast<uint32_t> (bindings.size()), bindings.data());
-            unit.descriptorSetLayout = this->device.createDescriptorSetLayout(layoutInfo);
-
-            std::array<vk::DescriptorPoolSize, 3> poolSizes = {
-                vk::DescriptorPoolSize(vk::DescriptorType::eUniformBuffer, this->frameNumber),
-                vk::DescriptorPoolSize(vk::DescriptorType::eUniformBuffer, this->frameNumber),
-                vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler, this->frameNumber)
-            };
-            vk::DescriptorPoolCreateInfo poolInfo({}, this->frameNumber, poolSizes.size(), poolSizes.data());
-            unit.descriptorPool = this->device.createDescriptorPool(poolInfo);
-
-            std::vector<vk::DescriptorSetLayout> layouts(this->frameNumber, unit.descriptorSetLayout);
-            vk::DescriptorSetAllocateInfo allocInfo(unit.descriptorPool, this->frameNumber, layouts.data());
-
-            unit.pipelineLayout = this->device.createPipelineLayout(vk::PipelineLayoutCreateInfo({}, 1, &unit.descriptorSetLayout));
             vk::PipelineVertexInputStateCreateInfo& iscr = unit.vertexShader.getPipelineVertexInputStateCreateInfo();
 
             vk::GraphicsPipelineCreateInfo pipelineInfo({}, 2, shaderStages, &iscr, &inputAssembly,{}, &viewportState,
-                    &rasterizer, &multisampling, &depthStencil, &colorBlending,{}, unit.pipelineLayout,
+                    &rasterizer, &multisampling, &depthStencil, &colorBlending,{}, this->pipelineLayout,
                     frame->getRenderPass(), 0, vk::Pipeline(), -1);
 
             unit.graphicsPipeline = device.createGraphicsPipelines(vk::PipelineCache(),{pipelineInfo})[0];
 
-            for (ModelUnit& model : unit.models) {
-                model.descriptorSets = this->device.allocateDescriptorSets(allocInfo);
-                for (size_t j = 0; j < this->frameNumber; j++) {
-                    vk::DescriptorBufferInfo cameraInfo = this->camera->getDescriptorBufferInfo(j);
-                    vk::DescriptorBufferInfo matrixInfo = model.matrix.getDescriptorBufferInfo(j);
-                    vk::DescriptorImageInfo textureInfo = model.texture.getDescriptorBufferInfo(j);
+            vk::DescriptorPoolSize modelPoolSize(vk::DescriptorType::eUniformBuffer, this->frameNumber * unit.models.size());
+            vk::DescriptorPoolCreateInfo poolInfo({}, this->frameNumber * unit.models.size(), 1, &modelPoolSize);
+            unit.descriptorPool = this->device.createDescriptorPool(poolInfo);
 
-                    std::array<vk::WriteDescriptorSet, 3> descriptorWrites = {
-                        vk::WriteDescriptorSet(model.descriptorSets[j],
-                        0, 0, 1, vk::DescriptorType::eUniformBuffer,
-                        {}, &cameraInfo,
-                        {}),
-                        vk::WriteDescriptorSet(model.descriptorSets[j],
-                        1, 0, 1, vk::DescriptorType::eUniformBuffer,
-                        {}, &matrixInfo,
-                        {}),
-                        vk::WriteDescriptorSet(model.descriptorSets[j], 2, 0, 1, vk::DescriptorType::eCombinedImageSampler, &textureInfo,
-                        {},
-                        {})
-                    };
+            std::vector<vk::DescriptorSetLayout> layouts(this->frameNumber * unit.models.size(), this->modelLayout);
+            vk::DescriptorSetAllocateInfo allocInfo(unit.descriptorPool, layouts.size(), layouts.data());
+            unit.descriptorSets = this->device.allocateDescriptorSets(allocInfo);
 
-                    this->device.updateDescriptorSets(descriptorWrites,{});
+            std::vector<vk::WriteDescriptorSet> descriptorWrites;
+            std::vector<vk::DescriptorBufferInfo> matrixInfos(this->frameNumber * unit.models.size());
+            for (size_t j = 0; j < this->frameNumber; j++) {
+                int i = 0;
+                for (ModelUnit& model : unit.models) {
+                    uint32_t index = i * this->frameNumber + j;
+                    matrixInfos[index] = model.matrix.getDescriptorBufferInfo(j);
+                    descriptorWrites.push_back(vk::WriteDescriptorSet(unit.descriptorSets[index],
+                            0, 0, 1, vk::DescriptorType::eUniformBuffer,{
+                    }, &matrixInfos[index],{}));
+                    i++;
                 }
+            }
+            this->device.updateDescriptorSets(descriptorWrites,{});
+
+            for (ModelUnit& model : unit.models) {
+                uint32_t partsCount = model.model.getPartNames().size();
+                vk::DescriptorPoolSize samplerPoolSize(vk::DescriptorType::eCombinedImageSampler, this->frameNumber * partsCount);
+                vk::DescriptorPoolSize materialPoolSize(vk::DescriptorType::eUniformBuffer, this->frameNumber * partsCount);
+                vk::DescriptorPoolSize modelPoolSizes[] = {samplerPoolSize, materialPoolSize};
+                vk::DescriptorPoolCreateInfo poolInfo({}, this->frameNumber * partsCount, 2, modelPoolSizes);
+                model.descriptorPool = this->device.createDescriptorPool(poolInfo);
+
+                std::vector<vk::DescriptorSetLayout> layouts(this->frameNumber * partsCount, this->materialLayout);
+                vk::DescriptorSetAllocateInfo allocInfo(model.descriptorPool, layouts.size(), layouts.data());
+                model.descriptorSets = this->device.allocateDescriptorSets(allocInfo);
+
+                std::vector<vk::WriteDescriptorSet> partWrites;
+                //so far there's one texture info per model, in the future there should be one texture info per part
+                std::vector<vk::DescriptorBufferInfo> materialInfos(this->frameNumber * partsCount);
+                std::vector<vk::DescriptorImageInfo> texturesInfos(this->frameNumber * partsCount);
+                for (size_t j = 0; j < this->frameNumber; j++) {
+                    for (uint32_t i = 0; i < partsCount; ++i) {
+                        uint32_t index = i * this->frameNumber + j;
+                        zvlk::Material* mat = model.model.getMaterial(i);
+                        materialInfos[index] = mat->getDescriptorBufferInfo(j);
+                        texturesInfos[index] = model.texture.getDescriptorBufferInfo(j);
+                        partWrites.push_back(
+                                vk::WriteDescriptorSet(model.descriptorSets[index], 0, 0, 1, vk::DescriptorType::eCombinedImageSampler, &texturesInfos[index],{},
+                        {
+                        }));
+                        partWrites.push_back(
+                                vk::WriteDescriptorSet(model.descriptorSets[index], 1, 0, 1, vk::DescriptorType::eUniformBuffer,{}, &materialInfos[index],{
+                        }));
+                    }
+                }
+                this->device.updateDescriptorSets(partWrites,{});
             }
 
             i++;
@@ -163,16 +222,23 @@ namespace zvlk {
 
             for (ExecutionUnit& unit : this->units) {
                 commandBuffers[i].bindPipeline(vk::PipelineBindPoint::eGraphics, unit.graphicsPipeline);
+                commandBuffers[i].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, this->pipelineLayout, 0, 1, &this->descriptorSets[i], 0, nullptr);
 
+                int j = 0;
                 for (ModelUnit& model : unit.models) {
-                    commandBuffers[i].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, unit.pipelineLayout, 0, 1, &model.descriptorSets[i], 0, nullptr);
+                    commandBuffers[i].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, this->pipelineLayout, 1, 1, &unit.descriptorSets[j * this->frameNumber + i], 0, nullptr);
+                    // if parts are sorted by material, this could be optimized and only some bindings done for this descriptor sets
+                    int k = 0;
                     for (std::string& name : model.model.getPartNames()) {
+                        commandBuffers[i].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, this->pipelineLayout, 2, 1, &model.descriptorSets[k * this->frameNumber + i], 0, nullptr);
+
                         vk::Buffer vertexBuffers[] = {model.model.getVertexBuffer(name)};
                         vk::DeviceSize offsets[] = {0};
                         commandBuffers[i].bindVertexBuffers(0, 1, vertexBuffers, offsets);
                         commandBuffers[i].bindIndexBuffer(model.model.getIndexBuffer(name), 0, vk::IndexType::eUint32);
                         commandBuffers[i].drawIndexed(model.model.getNumberOfIndices(name), 1, 0, 0, 0);
                     }
+                    j++;
                 }
             }
             commandBuffers[i].endRenderPass();

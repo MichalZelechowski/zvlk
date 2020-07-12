@@ -12,7 +12,7 @@
 
 namespace zvlk {
 
-    Model::Model(zvlk::Device* device, const std::string name) {
+    Model::Model(zvlk::Device* device, const std::string name, zvlk::Frame* frame) {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> materials;
@@ -27,14 +27,24 @@ namespace zvlk {
         vk::DeviceSize vertexBufferSize = 0;
         vk::DeviceSize indicesBufferSize = 0;
         vk::DeviceSize maxStagingBufferSize = 0;
+        for(tinyobj::material_t& mat : materials) {
+            this->materials.push_back(new Material(device,frame, mat.name, 
+                    glm::vec4(mat.ambient[0],mat.ambient[1],mat.ambient[2],1.0f),
+                    glm::vec4(mat.diffuse[0],mat.diffuse[1],mat.diffuse[2],1.0f),
+                    glm::vec4(mat.specular[0],mat.specular[1],mat.specular[2],1.0f),
+                    mat.shininess));
+        }
         for (const auto& shape : shapes) {
             uniqueVertices[shape.name] = std::unordered_map<Vertex, uint32_t>();
             this->indices[shape.name] = std::vector<uint32_t>();
             this->vertices[shape.name] = std::vector<Vertex>();
+            this->materialMapping[shape.name] = this->materials[shape.mesh.material_ids[0]];
+            this->names.push_back(shape.name);
+            
             for (const auto& index : shape.mesh.indices) {
                 Vertex vertex{};
 
-                vertex.pos = {
+                vertex.position = {
                     attrib.vertices[3 * index.vertex_index + 0],
                     attrib.vertices[3 * index.vertex_index + 1],
                     attrib.vertices[3 * index.vertex_index + 2]
@@ -45,9 +55,6 @@ namespace zvlk {
                     1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
                 };
 
-                vertex.color = {materials[shape.mesh.material_ids[0]].diffuse[0],
-                    materials[shape.mesh.material_ids[0]].diffuse[1],
-                    materials[shape.mesh.material_ids[0]].diffuse[2]};
                 vertex.normal = {
                     attrib.normals[3 * index.normal_index + 0],
                     attrib.normals[3 * index.normal_index + 1],
@@ -123,6 +130,9 @@ namespace zvlk {
         for (auto& name : names) {
             iB.push_back(this->indexBuffer[name]);
             vB.push_back(this->vertexBuffer[name]);
+        }
+        for (auto material: materials) {
+            delete material;
         }
         this->device->freeMemory(iB, this->indexBufferMemory);
         this->device->freeMemory(vB, this->vertexBufferMemory);
