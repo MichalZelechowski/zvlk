@@ -17,25 +17,19 @@ layout(set = 2, binding = 1) uniform MaterialUbo {
 
 void main() {
     vec3 lightPosition = vec3(1000.0, 1000.0, 1000.0);
-    vec3 lightColor = vec3(1.0, 1.0, 1.0);
+    vec4 lightColor = vec4(1.0, 1.0, 1.0, 1.0);
     vec3 cameraPosition = vec3(1000.0, 1000.0, 1000.0);
-
-    //ambient
-    float ambientStrength = 0.1;
-    vec3 ambient = ambientStrength * lightColor;
 
     //diffuse
     vec3 normal = normalize(inNormal);
     vec3 lightDirection = normalize(lightPosition - inPosition);  
-    vec3 diffuse = max(dot(normal, lightDirection), 0.0) * lightColor;
+    float diffuse = max(dot(normal, lightDirection), 0.0);
 
     //specular
-    float specularStrength = 0.5; //TODO in material
     vec3 viewDirection = normalize(cameraPosition - inPosition);
     vec3 reflectDirection = reflect(-lightDirection, normal);
-    float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), materialUbo.shiness);
-    vec3 specular = specularStrength * spec * lightColor;  
+    float specular = pow(max(dot(viewDirection, reflectDirection), 0.0), materialUbo.shiness);  
 
     //total
-    outColor = vec4(ambient * materialUbo.ambient.rgb + diffuse * materialUbo.diffuse.rgb + specular * materialUbo.specular.rgb, 1.0);
+    outColor = vec4(materialUbo.ambient.rgb + diffuse * materialUbo.diffuse.rgb + specular * materialUbo.specular.rgb, 1.0) * lightColor;
 }
