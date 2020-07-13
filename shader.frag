@@ -50,8 +50,12 @@ void main() {
         vec3 reflectDirection = reflect(-lightDirection, normal);
         float specular = pow(max(dot(viewDirection, reflectDirection), 0.0), materialUbo.shiness);  
 
+        //attenuation
+        float distance = length(lightPosition - inPosition);
+        float attenuation = min(lightsUbo.lights[i].attenuation > 0 ? 1.0 / (lightsUbo.lights[i].attenuation * distance * distance) : 1.0, 1.0);
+
         //total
-        outColor += vec4(0.1 * materialUbo.ambient.rgb + diffuse * materialUbo.diffuse.rgb + specular * materialUbo.specular.rgb, 1.0) * lightColor;
+        outColor += vec4(0.1 * materialUbo.ambient.rgb + diffuse * materialUbo.diffuse.rgb + specular * materialUbo.specular.rgb, 1.0) * lightColor * attenuation;
     }
     outColor = vec4(outColor.xyz, 1.0);
 }
