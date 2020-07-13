@@ -23,7 +23,7 @@ namespace zvlk {
     };
     
     struct LightsUBO {
-        alignas(16) uint32_t numberOfLights;
+        alignas(16) float numberOfLights;
         alignas(16) LightUBO lights[MAX_LIGHTS];
     };
     

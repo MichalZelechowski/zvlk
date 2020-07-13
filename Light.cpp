@@ -20,7 +20,7 @@ namespace zvlk {
     }
 
     void* Lights::update(uint32_t index, float time) {
-        this->ubos[index].numberOfLights = this->lights.size();
+        this->ubos[index].numberOfLights = static_cast<float>(this->lights.size());
         for (size_t i = 0; i<this->ubos[index].numberOfLights; ++i) {
             this->ubos[index].lights[i] = {this->lights[i]->position, this->lights[i]->color, this->lights[i]->attenuation};
         }

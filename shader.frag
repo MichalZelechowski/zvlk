@@ -18,9 +18,10 @@ struct Light {
   float attenuation;
 };
 
+#define MAX_LIGHTS 8
 layout(set = 0, binding = 1) uniform LightsUbo {
     float numberOfLights;
-    Light lights[];
+    Light lights[MAX_LIGHTS];
 } lightsUbo;
 
 layout(set = 2, binding = 0) uniform sampler2D texSampler;
@@ -32,20 +33,25 @@ layout(set = 2, binding = 1) uniform MaterialUbo {
 } materialUbo;
 
 void main() {
-    vec3 lightPosition = lightsUbo.lights[0].position;
-    vec4 lightColor = lightsUbo.lights[0].color;
-    vec3 cameraPosition = cameraUbo.view[3].xyz;
+    outColor = vec4(0.0);
 
-    //diffuse
-    vec3 normal = normalize(inNormal);
-    vec3 lightDirection = normalize(lightPosition - inPosition);  
-    float diffuse = max(dot(normal, lightDirection), 0.0);
+    for (int i=0; i< lightsUbo.numberOfLights; ++i) {
+        vec3 lightPosition = lightsUbo.lights[i].position;
+        vec4 lightColor = lightsUbo.lights[i].color;
+        vec3 cameraPosition = cameraUbo.view[3].xyz;
 
-    //specular
-    vec3 viewDirection = normalize(cameraPosition - inPosition);
-    vec3 reflectDirection = reflect(-lightDirection, normal);
-    float specular = pow(max(dot(viewDirection, reflectDirection), 0.0), materialUbo.shiness);  
+        //diffuse
+        vec3 normal = normalize(inNormal);
+        vec3 lightDirection = normalize(lightPosition - inPosition);  
+        float diffuse = max(dot(normal, lightDirection), 0.0);
 
-    //total
-    outColor = vec4(0.1 * materialUbo.ambient.rgb + diffuse * materialUbo.diffuse.rgb + specular * materialUbo.specular.rgb, 1.0) * lightColor;
+        //specular
+        vec3 viewDirection = normalize(cameraPosition - inPosition);
+        vec3 reflectDirection = reflect(-lightDirection, normal);
+        float specular = pow(max(dot(viewDirection, reflectDirection), 0.0), materialUbo.shiness);  
+
+        //total
+        outColor += vec4(0.1 * materialUbo.ambient.rgb + diffuse * materialUbo.diffuse.rgb + specular * materialUbo.specular.rgb, 1.0) * lightColor;
+    }
+    outColor = vec4(outColor.xyz, 1.0);
 }
