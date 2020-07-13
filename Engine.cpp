@@ -19,6 +19,8 @@ namespace zvlk {
             this->device.destroy(inFlightFences[i]);
         }
         this->clean();
+        
+        delete this->lights;
     }
 
     void Engine::clean() {
@@ -40,8 +42,6 @@ namespace zvlk {
         this->device.destroy(this->sceneLayout);
         this->device.destroy(this->modelLayout);
         this->device.destroy(this->materialLayout);
-        
-        delete this->lights;
     }
 
     Engine::Engine(zvlk::Frame* frame, zvlk::Device* deviceObject) {
