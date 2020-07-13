@@ -40,6 +40,8 @@ namespace zvlk {
         this->device.destroy(this->sceneLayout);
         this->device.destroy(this->modelLayout);
         this->device.destroy(this->materialLayout);
+        
+        delete this->lights;
     }
 
     Engine::Engine(zvlk::Frame* frame, zvlk::Device* deviceObject) {
@@ -47,6 +49,7 @@ namespace zvlk {
         this->frameNumber = frame->getImagesNumber();
         this->frame = frame;
         this->deviceObject = deviceObject;
+        this->lights = new Lights(deviceObject, frame);
 
         imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
         renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -103,23 +106,26 @@ namespace zvlk {
 
         //per scene
         vk::DescriptorSetLayoutBinding cameraBinding(0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment);
+        vk::DescriptorSetLayoutBinding lightsBinding(1, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eFragment);
         //per model
         vk::DescriptorSetLayoutBinding transformationBinding(0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex);
         //per material
         vk::DescriptorSetLayoutBinding samplerLayoutBinding(0, vk::DescriptorType::eCombinedImageSampler, 1, vk::ShaderStageFlagBits::eFragment);
         vk::DescriptorSetLayoutBinding materialBinding(1, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eFragment);
 
-        std::array<vk::DescriptorSetLayoutBinding, 4> descriptorSetLayoutBindings = {cameraBinding, transformationBinding, samplerLayoutBinding, materialBinding};
+        std::array<vk::DescriptorSetLayoutBinding, 5> descriptorSetLayoutBindings = {cameraBinding, lightsBinding, transformationBinding, samplerLayoutBinding, materialBinding};
 
-        vk::DescriptorSetLayoutCreateInfo sceneLayoutInfo({}, 1, &descriptorSetLayoutBindings.data()[0]);
+        vk::DescriptorSetLayoutCreateInfo sceneLayoutInfo({}, 2, &descriptorSetLayoutBindings.data()[0]);
         this->sceneLayout = this->device.createDescriptorSetLayout(sceneLayoutInfo);
-        vk::DescriptorSetLayoutCreateInfo modelLayoutInfo({}, 1, &descriptorSetLayoutBindings.data()[1]);
+        vk::DescriptorSetLayoutCreateInfo modelLayoutInfo({}, 1, &descriptorSetLayoutBindings.data()[2]);
         this->modelLayout = this->device.createDescriptorSetLayout(modelLayoutInfo);
-        vk::DescriptorSetLayoutCreateInfo materialLayoutInfo({}, 2, &descriptorSetLayoutBindings.data()[2]);
+        vk::DescriptorSetLayoutCreateInfo materialLayoutInfo({}, 2, &descriptorSetLayoutBindings.data()[3]);
         this->materialLayout = this->device.createDescriptorSetLayout(materialLayoutInfo);
 
-        vk::DescriptorPoolSize scenePoolSize(vk::DescriptorType::eUniformBuffer, this->frameNumber);
-        vk::DescriptorPoolCreateInfo poolInfo({}, this->frameNumber, 1, &scenePoolSize);
+        vk::DescriptorPoolSize cameraPoolSize(vk::DescriptorType::eUniformBuffer, this->frameNumber);
+        vk::DescriptorPoolSize lightsPoolSize(vk::DescriptorType::eUniformBuffer, this->frameNumber);
+        vk::DescriptorPoolSize scenePoolSize[] = {cameraPoolSize, lightsPoolSize};
+        vk::DescriptorPoolCreateInfo poolInfo({}, this->frameNumber, 2, scenePoolSize);
         this->descriptorPool = this->device.createDescriptorPool(poolInfo);
 
         std::vector<vk::DescriptorSetLayout> layouts(this->frameNumber, this->sceneLayout);
@@ -131,10 +137,14 @@ namespace zvlk {
 
         std::vector<vk::WriteDescriptorSet> descriptorWrites;
         std::vector<vk::DescriptorBufferInfo> cameraInfos(this->frameNumber);
+        std::vector<vk::DescriptorBufferInfo> lightsInfos(this->frameNumber);
         for (size_t j = 0; j < this->frameNumber; j++) {
             cameraInfos[j] = this->camera->getDescriptorBufferInfo(j);
+            lightsInfos[j] = this->lights->getDescriptorBufferInfo(j);
             descriptorWrites.push_back(vk::WriteDescriptorSet(this->descriptorSets[j],
                     0, 0, 1, vk::DescriptorType::eUniformBuffer,{}, &cameraInfos[j],{}));
+            descriptorWrites.push_back(vk::WriteDescriptorSet(this->descriptorSets[j],
+                    1, 0, 1, vk::DescriptorType::eUniformBuffer,{}, &lightsInfos[j],{}));
         }
         this->device.updateDescriptorSets(descriptorWrites,{});
 

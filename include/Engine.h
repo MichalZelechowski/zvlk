@@ -17,6 +17,7 @@
 #include "Texture.h"
 #include "TransformationMatrices.h"
 #include "Camera.h"
+#include "Light.h"
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -50,14 +51,22 @@ namespace zvlk {
         Engine(const Engine& orig) = delete;
         Engine(zvlk::Frame* frame, zvlk::Device* deviceObject);
         virtual ~Engine();
-        
+
         void clean();
+
         inline void addCallback(EngineCallback* callback) {
             this->callbacks.push_back(callback);
         };
-        
+
         inline void setCamera(zvlk::Camera *camera) {
             this->camera = camera;
+        }
+
+        inline void attachLight(zvlk::Light* light) {
+            this->lights->addLight(light);
+            for (uint32_t i = 0; i < this->frameNumber; ++i) {
+                dynamic_cast<zvlk::UniformBuffer*>(this->lights)->update(i);
+            }
         }
 
         void enableShaders(zvlk::VertexShader& vertexShader, zvlk::FragmentShader& fragmentShader);
@@ -72,6 +81,7 @@ namespace zvlk {
         zvlk::Frame* frame;
         zvlk::Device* deviceObject;
         zvlk::Camera* camera;
+        zvlk::Lights* lights;
 
         vk::DescriptorSetLayout sceneLayout;
         vk::DescriptorSetLayout modelLayout;
@@ -79,7 +89,7 @@ namespace zvlk {
         vk::DescriptorPool descriptorPool;
         std::vector<vk::DescriptorSet> descriptorSets;
         vk::PipelineLayout pipelineLayout;
-        
+
         std::vector<vk::Semaphore> imageAvailableSemaphores;
         std::vector<vk::Semaphore> renderFinishedSemaphores;
         std::vector<vk::Fence> inFlightFences;

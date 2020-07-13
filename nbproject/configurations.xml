@@ -9,6 +9,7 @@
       <itemPath>include/Engine.h</itemPath>
       <itemPath>include/FragmentShader.h</itemPath>
       <itemPath>include/Frame.h</itemPath>
+      <itemPath>include/Light.h</itemPath>
       <itemPath>include/Material.h</itemPath>
       <itemPath>include/Model.h</itemPath>
       <itemPath>include/Shader.h</itemPath>
@@ -31,6 +32,7 @@
       <itemPath>Engine.cpp</itemPath>
       <itemPath>FragmentShader.cpp</itemPath>
       <itemPath>Frame.cpp</itemPath>
+      <itemPath>Light.cpp</itemPath>
       <itemPath>Material.cpp</itemPath>
       <itemPath>Model.cpp</itemPath>
       <itemPath>Shader.cpp</itemPath>
@@ -94,6 +96,8 @@
       </item>
       <item path="Frame.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="Light.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="Material.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Model.cpp" ex="false" tool="1" flavor2="0">
@@ -123,6 +127,8 @@
       <item path="include/FragmentShader.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/Frame.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Light.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/Material.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -190,6 +196,8 @@
       </item>
       <item path="Frame.cpp" ex="false" tool="1" flavor2="12">
       </item>
+      <item path="Light.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="Material.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Model.cpp" ex="false" tool="1" flavor2="12">
@@ -219,6 +227,8 @@
       <item path="include/FragmentShader.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/Frame.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Light.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/Material.h" ex="false" tool="3" flavor2="0">
       </item>

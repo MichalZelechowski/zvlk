@@ -40,6 +40,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/Engine.o \
 	${OBJECTDIR}/FragmentShader.o \
 	${OBJECTDIR}/Frame.o \
+	${OBJECTDIR}/Light.o \
 	${OBJECTDIR}/Material.o \
 	${OBJECTDIR}/Model.o \
 	${OBJECTDIR}/Shader.o \
@@ -100,6 +101,11 @@ ${OBJECTDIR}/Frame.o: Frame.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` `pkg-config --cflags glm` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Frame.o Frame.cpp
+
+${OBJECTDIR}/Light.o: Light.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -w -s -DNDEBUG -Iinclude `pkg-config --cflags vulkan` `pkg-config --cflags glfw3` `pkg-config --cflags libzip` `pkg-config --cflags glm` -std=c++17  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Light.o Light.cpp
 
 ${OBJECTDIR}/Material.o: Material.cpp
 	${MKDIR} -p ${OBJECTDIR}

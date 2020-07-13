@@ -12,6 +12,17 @@ layout(set = 0, binding = 0) uniform CameraUbo {
     mat4 proj;
 } cameraUbo;
 
+struct Light {
+  vec3 position;
+  vec4 color;
+  float attenuation;
+};
+
+layout(set = 0, binding = 1) uniform LightsUbo {
+    float numberOfLights;
+    Light lights[];
+} lightsUbo;
+
 layout(set = 2, binding = 0) uniform sampler2D texSampler;
 layout(set = 2, binding = 1) uniform MaterialUbo {
     vec4 ambient;
@@ -21,8 +32,8 @@ layout(set = 2, binding = 1) uniform MaterialUbo {
 } materialUbo;
 
 void main() {
-    vec3 lightPosition = vec3(1000.0, 1000.0, 1000.0);
-    vec4 lightColor = vec4(1.0, 1.0, 1.0, 1.0);
+    vec3 lightPosition = lightsUbo.lights[0].position;
+    vec4 lightColor = lightsUbo.lights[0].color;
     vec3 cameraPosition = cameraUbo.view[3].xyz;
 
     //diffuse

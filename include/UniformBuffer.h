@@ -34,7 +34,6 @@ namespace zvlk {
         vk::DeviceSize size;
         std::vector<vk::Buffer> uniformBuffers;
         std::vector<vk::DeviceMemory> uniformBuffersMemory;
-        vk::WriteDescriptorSet writeDescriptorSet;
 
     };
 }

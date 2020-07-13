@@ -16,12 +16,15 @@
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Model.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Window.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/shader.frag</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Light.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Camera.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Vulkan.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Material.cpp</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Light.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/UniformBuffer.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Shader.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Frame.cpp</file>
+            <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/Engine.h</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Camera.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/Window.cpp</file>
             <file>file:/home/michal/Projects/zeltracer/vulkanStarter/include/TransformationMatrices.h</file>

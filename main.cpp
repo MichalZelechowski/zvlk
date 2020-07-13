@@ -76,6 +76,8 @@ private:
                 .translate(glm::vec3(0.0f, -250.0f, 0.0f));
         this->engine = new zvlk::Engine(this->frame, this->device);
         this->engine->setCamera(this->camera);
+        this->engine->attachLight(new zvlk::Light({1000.0f, 1000.0f, 1000.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, 1.0f));
+        this->engine->attachLight(new zvlk::Light({-1000.0f, 1000.0f, 1000.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, 1.0f));
         this->engine->enableShaders(*this->vertexShader, *this->fragmentShader);
         this->engine->draw(*this->model, *this->transformationMatrices, *this->texture);
         this->engine->compile();
