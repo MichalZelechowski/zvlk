@@ -23,13 +23,13 @@ namespace zvlk {
         uniformBuffersMemory.clear();
     }
 
-    UniformBuffer::UniformBuffer(zvlk::Device* device, vk::DeviceSize size, zvlk::Frame* frame) {
+    UniformBuffer::UniformBuffer(zvlk::Device* device, vk::DeviceSize size, std::shared_ptr<zvlk::Frame> frame) {
         this->size = size;
         this->device = device;
         this->create(frame);
     }
     
-    void UniformBuffer::create(zvlk::Frame* frame) {
+    void UniformBuffer::create(std::shared_ptr<zvlk::Frame> frame) {
         uniformBuffers.resize(frame->getImagesNumber());
         uniformBuffersMemory.resize(frame->getImagesNumber());
 

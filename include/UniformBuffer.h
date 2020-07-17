@@ -19,10 +19,10 @@ namespace zvlk {
     public:
         UniformBuffer() = delete;
         UniformBuffer(const UniformBuffer& orig) = delete;
-        UniformBuffer(zvlk::Device* device, vk::DeviceSize size, zvlk::Frame* frame);
+        UniformBuffer(zvlk::Device* device, vk::DeviceSize size, std::shared_ptr<zvlk::Frame> frame);
         virtual ~UniformBuffer();
         
-        void create(zvlk::Frame* frame);
+        void create(std::shared_ptr<zvlk::Frame> frame);
         void destroy();
         void update(uint32_t index);
         vk::DeviceSize getSize();

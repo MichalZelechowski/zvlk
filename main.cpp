@@ -40,7 +40,7 @@ private:
     zvlk::Window *window;
     zvlk::Vulkan *vulkan;
     zvlk::Device *device;
-    zvlk::Frame *frame;
+    std::shared_ptr<zvlk::Frame> frame;
     zvlk::Texture *texture;
     zvlk::Model* model;
     zvlk::VertexShader *vertexShader;
@@ -187,7 +187,7 @@ private:
 
         delete this->texture;
 
-        delete this->frame;
+        this->frame.reset();
 
         delete this->vulkan;
 

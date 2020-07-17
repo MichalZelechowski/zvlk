@@ -25,7 +25,7 @@ namespace zvlk {
     public:
         Material() = delete;
         Material(const Material& orig) = delete;
-        Material(zvlk::Device* device, zvlk::Frame* frame, std::string name, glm::vec4 ambient, glm::vec4 diffuse, glm::vec4 specular, float shiness);
+        Material(zvlk::Device* device, std::shared_ptr<zvlk::Frame> frame, std::string name, glm::vec4 ambient, glm::vec4 diffuse, glm::vec4 specular, float shiness);
         virtual ~Material();
     protected:
         virtual void* update(uint32_t index, float time);

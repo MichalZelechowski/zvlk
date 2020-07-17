@@ -14,7 +14,7 @@ namespace zvlk {
     TransformationMatrices::~TransformationMatrices() {
     }
 
-    TransformationMatrices::TransformationMatrices(zvlk::Device* device, zvlk::Frame* frame) : UniformBuffer(device, sizeof (TransformationMatricesUBO), frame) {
+    TransformationMatrices::TransformationMatrices(zvlk::Device* device, std::shared_ptr<zvlk::Frame> frame) : UniformBuffer(device, sizeof (TransformationMatricesUBO), frame) {
         this->ubos.resize(frame->getImagesNumber());
         this->current = glm::mat4(1.0f);
     }

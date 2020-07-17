@@ -54,7 +54,7 @@ namespace zvlk {
     public:
         Model() = delete;
         Model(const Model& orig) = delete;
-        Model(zvlk::Device* device, const std::string name, zvlk::Frame* frame);
+        Model(zvlk::Device* device, const std::string name,  std::shared_ptr<zvlk::Frame> frame);
         virtual ~Model();
 
         inline std::vector<std::string> getPartNames() {

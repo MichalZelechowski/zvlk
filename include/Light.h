@@ -45,7 +45,7 @@ namespace zvlk {
     public:
         Lights() = delete;
         Lights(const Lights& orig) = delete;
-        Lights(zvlk::Device* device, zvlk::Frame* frame);
+        Lights(zvlk::Device* device, std::shared_ptr<zvlk::Frame> frame);
         virtual ~Lights();
         
         void addLight(zvlk::Light* light) {

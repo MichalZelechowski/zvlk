@@ -24,7 +24,7 @@ namespace zvlk {
     public:
         Camera() = delete;
         Camera(const Camera& orig) = delete;
-        Camera(zvlk::Device* device, zvlk::Frame* frame, glm::vec3 eye, glm::vec3 center = glm::vec3(0.0f, 0.0f, 0.0f), float fov = 45.0f,
+        Camera(zvlk::Device* device, std::shared_ptr<zvlk::Frame> frame, glm::vec3 eye, glm::vec3 center = glm::vec3(0.0f, 0.0f, 0.0f), float fov = 45.0f,
                 glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f), float near = 0.1f, float far = 10.0f);
         virtual ~Camera();
 
@@ -39,7 +39,7 @@ namespace zvlk {
         float near;
         float far;
 
-        zvlk::Frame* frame;
+        std::shared_ptr<zvlk::Frame> frame;
         std::vector<CameraUBO> ubos;
     };
 }

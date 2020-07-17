@@ -9,7 +9,7 @@
 
 namespace zvlk {
 
-    Material::Material(zvlk::Device* device, zvlk::Frame* frame, std::string name, glm::vec4 ambient, glm::vec4 diffuse, glm::vec4 specular, float shiness) :
+    Material::Material(zvlk::Device* device, std::shared_ptr<zvlk::Frame> frame, std::string name, glm::vec4 ambient, glm::vec4 diffuse, glm::vec4 specular, float shiness) :
     UniformBuffer(device, sizeof (MaterialUBO), frame) {
         this->name = name;
         this->ubos.resize(frame->getImagesNumber());

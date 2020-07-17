@@ -61,7 +61,7 @@ namespace zvlk {
         const vk::FormatProperties getFormatProperties(vk::Format format);
         vk::SampleCountFlagBits getMaxUsableSampleCount();
 
-        zvlk::Frame* initializeForGraphics(vk::SurfaceKHR surface, const std::vector<const char*>, const std::vector<const char*> deviceExtensions);
+        std::shared_ptr<zvlk::Frame> initializeForGraphics(vk::SurfaceKHR surface, const std::vector<const char*>, const std::vector<const char*> deviceExtensions);
 
         bool doesSupportExtensions(const std::vector<const char*> extensions);
         bool doesSupportGraphics(vk::SurfaceKHR surface);

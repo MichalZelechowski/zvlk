@@ -36,7 +36,7 @@ namespace zvlk {
         void addSurface(zvlk::Window* window);
         void destroySurface();
         zvlk::Device* getDevice(zvlk::DeviceAssessment* assessment);
-        zvlk::Frame* initializeDeviceForGraphics(zvlk::Device* device);
+        std::shared_ptr<zvlk::Frame> initializeDeviceForGraphics(zvlk::Device* device);
         bool doesDeviceSupportExtensions(zvlk::Device* device);
         bool doesDeviceSupportGraphics(zvlk::Device* device);
         zvlk::SwapChainSupportDetails querySwapChainSupport(zvlk::Device* device);

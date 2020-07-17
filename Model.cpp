@@ -12,7 +12,7 @@
 
 namespace zvlk {
 
-    Model::Model(zvlk::Device* device, const std::string name, zvlk::Frame* frame) {
+    Model::Model(zvlk::Device* device, const std::string name, std::shared_ptr<zvlk::Frame> frame) {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> materials;

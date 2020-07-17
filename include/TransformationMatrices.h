@@ -27,7 +27,7 @@ namespace zvlk {
     public:
         TransformationMatrices() = delete;
         TransformationMatrices(const TransformationMatrices& orig) = delete;
-        TransformationMatrices(zvlk::Device* device, zvlk::Frame* frame);
+        TransformationMatrices(zvlk::Device* device, std::shared_ptr<zvlk::Frame> frame);
         virtual ~TransformationMatrices();
         
         TransformationMatrices& rotate(float angleDegrees, glm::vec3 direction);

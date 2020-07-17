@@ -44,7 +44,7 @@ namespace zvlk {
         this->device.destroy(this->materialLayout);
     }
 
-    Engine::Engine(zvlk::Frame* frame, zvlk::Device* deviceObject) {
+    Engine::Engine(std::shared_ptr<zvlk::Frame> frame, zvlk::Device* deviceObject) {
         this->device = deviceObject->getGraphicsDevice();
         this->frameNumber = frame->getImagesNumber();
         this->frame = frame;

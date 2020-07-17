@@ -181,9 +181,9 @@ namespace zvlk {
         return result;
     }
 
-    Frame* Vulkan::initializeDeviceForGraphics(zvlk::Device* device) {
+    std::shared_ptr<zvlk::Frame> Vulkan::initializeDeviceForGraphics(zvlk::Device* device) {
         const std::vector<const char*> noValidations;
-        zvlk::Frame* result = device->initializeForGraphics(this->surface, this->debug ? validationLayers : noValidations, deviceExtensions);
+        std::shared_ptr<zvlk::Frame> result = device->initializeForGraphics(this->surface, this->debug ? validationLayers : noValidations, deviceExtensions);
         return result;
     }
 

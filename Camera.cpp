@@ -15,7 +15,7 @@ namespace zvlk {
     Camera::~Camera() {
     }
 
-    Camera::Camera(zvlk::Device* device, zvlk::Frame* frame, glm::vec3 eye, glm::vec3 center, float fov, glm::vec3 up, float near, float far) :
+    Camera::Camera(zvlk::Device* device, std::shared_ptr<zvlk::Frame> frame, glm::vec3 eye, glm::vec3 center, float fov, glm::vec3 up, float near, float far) :
     UniformBuffer(device, sizeof (CameraUBO), frame), eye(eye), center(center), fov(fov), up(up), near(near), far(far) {
         this->ubos.resize(frame->getImagesNumber());
         this->frame = frame;

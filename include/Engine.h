@@ -49,7 +49,7 @@ namespace zvlk {
     public:
         Engine() = delete;
         Engine(const Engine& orig) = delete;
-        Engine(zvlk::Frame* frame, zvlk::Device* deviceObject);
+        Engine(std::shared_ptr<zvlk::Frame> frame, zvlk::Device* deviceObject);
         virtual ~Engine();
 
         void clean();
@@ -78,7 +78,7 @@ namespace zvlk {
         std::vector<vk::CommandBuffer> commandBuffers;
         vk::Device device;
         uint32_t frameNumber;
-        zvlk::Frame* frame;
+        std::shared_ptr<zvlk::Frame> frame;
         zvlk::Device* deviceObject;
         zvlk::Camera* camera;
         zvlk::Lights* lights;

@@ -9,7 +9,7 @@
 
 namespace zvlk {
 
-    Lights::Lights(zvlk::Device* device, zvlk::Frame* frame) : UniformBuffer(device, sizeof (LightsUBO), frame) {
+    Lights::Lights(zvlk::Device* device, std::shared_ptr<zvlk::Frame> frame) : UniformBuffer(device, sizeof (LightsUBO), frame) {
         this->ubos.resize(frame->getImagesNumber());
     }
 

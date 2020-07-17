@@ -41,7 +41,7 @@ namespace zvlk {
         return this->memoryProperties;
     }
 
-    zvlk::Frame* Device::initializeForGraphics(vk::SurfaceKHR surface, const std::vector<const char*> validationLayers, const std::vector<const char*> deviceExtensions) {
+    std::shared_ptr<zvlk::Frame> Device::initializeForGraphics(vk::SurfaceKHR surface, const std::vector<const char*> validationLayers, const std::vector<const char*> deviceExtensions) {
         zvlk::QueueFamilyIndices indices = this->findQueueFamilies(surface);
 
         std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
@@ -74,7 +74,7 @@ namespace zvlk {
             {}, indices.graphicsFamily
         });
 
-        zvlk::Frame* result = new zvlk::Frame(this, (VkSurfaceKHR) surface);
+        std::shared_ptr<zvlk::Frame> result(new zvlk::Frame(this, (VkSurfaceKHR) surface));
         return result;
     }
 
