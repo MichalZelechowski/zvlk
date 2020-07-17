@@ -33,7 +33,7 @@ namespace zvlk {
         Vulkan(const Vulkan& orig) = delete;
         virtual ~Vulkan();
 
-        void addSurface(zvlk::Window* window);
+        void addSurface(std::shared_ptr<zvlk::Window> window);
         void destroySurface();
         zvlk::Device* getDevice(zvlk::DeviceAssessment* assessment);
         std::shared_ptr<zvlk::Frame> initializeDeviceForGraphics(zvlk::Device* device);

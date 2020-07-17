@@ -82,7 +82,7 @@ namespace zvlk {
         }
     }
 
-    void Vulkan::addSurface(zvlk::Window* window) {
+    void Vulkan::addSurface(std::shared_ptr<zvlk::Window> window) {
         VkSurfaceKHR surfaceClassic;
         if (this->surface || glfwCreateWindowSurface(this->instance, window->getWindow(), nullptr, &surfaceClassic) != VK_SUCCESS) {
             throw std::runtime_error("failed to create window surface!");

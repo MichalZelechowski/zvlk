@@ -30,7 +30,7 @@ namespace zvlk {
         void create(zvlk::Device* device, vk::SurfaceKHR surface);
         void destroy();
 
-        inline void attachWindow(zvlk::Window* window) {
+        inline void attachWindow(std::shared_ptr<zvlk::Window> window) {
             this->window = window;
         }
 
@@ -46,7 +46,7 @@ namespace zvlk {
 
         vk::RenderPassBeginInfo getRenderPassBeginInfo(uint32_t index) const;
     private:
-        zvlk::Window* window;
+        std::shared_ptr<zvlk::Window> window;
         vk::Device graphicsDevice;
 
         vk::SwapchainKHR swapChain;
