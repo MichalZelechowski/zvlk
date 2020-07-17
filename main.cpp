@@ -38,9 +38,9 @@ public:
 
 private:
     std::shared_ptr<zvlk::Window> window;
-    zvlk::Vulkan *vulkan;
-    zvlk::Device *device;
+    std::unique_ptr<zvlk::Vulkan> vulkan;
     std::shared_ptr<zvlk::Frame> frame;
+    zvlk::Device *device;
     zvlk::Texture *texture;
     zvlk::Model* model;
     zvlk::VertexShader *vertexShader;
@@ -55,7 +55,7 @@ private:
     void init() {
         this->window = std::shared_ptr<zvlk::Window>(new zvlk::Window(800, 600, std::string("Vulkan"), dynamic_cast<WindowCallback*> (this)));
 
-        this->vulkan = new zvlk::Vulkan(enableValidationLayers, std::string("Triangle app"));
+        this->vulkan = std::unique_ptr<zvlk::Vulkan>(new zvlk::Vulkan(enableValidationLayers, std::string("Triangle app")));
         this->vulkan->addSurface(this->window);
         this->device = this->vulkan->getDevice(this);
 
@@ -186,10 +186,6 @@ private:
         delete this->model;
 
         delete this->texture;
-
-        this->frame.reset();
-
-        delete this->vulkan;
     }
 
     void resize(int width, int height) {
