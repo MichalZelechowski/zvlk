@@ -3,7 +3,7 @@ This repository is a training repository, that includes code from the excellent 
 Branches contain the following:
 * [object oriented code of vulkan tutorial](https://github.com/MichalZelechowski/zvlk/tree/objectify)
 * [vulkan tutorial with Vulkan HPP](https://github.com/MichalZelechowski/zvlk/tree/vulkan_hpp)
-* [multi part train model](https://github.com/MichalZelechowski/zvlk/tree/train)
+* [multi part train model](https://github.com/MichalZelechowski/zvlk/tree/train) - use *WSAD* for movement, *F* for fullscreen, *Q* for quit
 
 From vulkan-tutorial related code:
 * Drawing a triangle
