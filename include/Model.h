@@ -49,43 +49,44 @@ namespace zvlk {
             return position == other.position && texCoord == other.texCoord && normal == other.normal;
         }
     };
+    
+    struct ModelPart {
+        uint32_t numberOfIndices;
+        uint32_t indexOffset;
+    };
 
     class Model {
     public:
         Model() = delete;
         Model(const Model& orig) = delete;
-        Model(zvlk::Device* device, const std::string name,  std::shared_ptr<zvlk::Frame> frame);
+        Model(zvlk::Device* device, const std::string name, std::shared_ptr<zvlk::Frame> frame);
         virtual ~Model();
 
-        inline std::vector<std::string> getPartNames() {
-            return names;
-        }
-        
-        inline vk::Buffer getVertexBuffer(std::string name) {
-            return this->vertexBuffer[name];
+        inline vk::Buffer getVertexBuffer() {
+            return this->vertexBuffer;
         };
 
-        inline vk::Buffer getIndexBuffer(std::string name) {
-            return this->indexBuffer[name];
+        inline vk::Buffer getIndexBuffer() {
+            return this->indexBuffer;
         };
 
-        inline uint32_t getNumberOfIndices(std::string name) {
-            return this->indices[name].size();
+        inline std::vector<zvlk::Material*>& getMaterials() {
+            return this->materials;
         }
         
-        inline zvlk::Material* getMaterial(uint32_t index) {
-            return this->materialMapping[this->names[index]];
+        inline std::vector<zvlk::ModelPart>& getModelParts(zvlk::Material* material) {
+            return this->modelParts[material];
         }
-        
+
     private:
         zvlk::Device* device;
+        std::unordered_map<zvlk::Material*, std::vector<ModelPart>> modelParts;
         std::vector<zvlk::Material*> materials;
-        std::vector<std::string> names;
-        std::unordered_map<std::string, Material*> materialMapping;
-        std::unordered_map<std::string, std::vector<Vertex>> vertices;
-        std::unordered_map<std::string, std::vector<uint32_t>> indices;
-        std::unordered_map<std::string, vk::Buffer> vertexBuffer;
-        std::unordered_map<std::string, vk::Buffer> indexBuffer;
+        
+        std::vector<Vertex> vertices;
+        std::vector<uint32_t> indices;
+        vk::Buffer vertexBuffer;
+        vk::Buffer indexBuffer;
         vk::DeviceMemory vertexBufferMemory;
         vk::DeviceMemory indexBufferMemory;
     };

@@ -25,7 +25,6 @@ namespace zvlk {
 
     typedef struct ModelUnit {
         zvlk::Model& model;
-        zvlk::Texture& texture;
         zvlk::TransformationMatrices& matrix;
         vk::DescriptorPool descriptorPool;
         std::vector<vk::DescriptorSet> descriptorSets;
@@ -70,7 +69,7 @@ namespace zvlk {
         }
 
         void enableShaders(zvlk::VertexShader& vertexShader, zvlk::FragmentShader& fragmentShader);
-        void draw(zvlk::Model& model, zvlk::TransformationMatrices& transformationMatrices, zvlk::Texture& texture);
+        void draw(zvlk::Model& model, zvlk::TransformationMatrices& transformationMatrices);
         void compile();
         vk::Bool32 execute(vk::Bool32 framebufferResized);
     private:

@@ -10,6 +10,8 @@ layout(location = 0) out vec4 outColor;
 layout(set = 0, binding = 0) uniform CameraUbo {
     mat4 view;
     mat4 proj;
+    vec3 eye;
+    vec3 center;
 } cameraUbo;
 
 struct Light {
@@ -38,7 +40,7 @@ void main() {
     for (int i=0; i< lightsUbo.numberOfLights; ++i) {
         vec3 lightPosition = lightsUbo.lights[i].position;
         vec4 lightColor = lightsUbo.lights[i].color;
-        vec3 cameraPosition = cameraUbo.view[3].xyz;
+        vec3 cameraPosition = cameraUbo.eye;
 
         //diffuse
         vec3 normal = normalize(inNormal);
@@ -55,7 +57,7 @@ void main() {
         float attenuation = min(lightsUbo.lights[i].attenuation > 0 ? 1.0 / (lightsUbo.lights[i].attenuation * distance * distance) : 1.0, 1.0);
 
         //total
-        outColor += vec4(0.1 * materialUbo.ambient.rgb + diffuse * materialUbo.diffuse.rgb + specular * materialUbo.specular.rgb, 1.0) * lightColor * attenuation;
+        outColor += vec4(0.1 * materialUbo.ambient.rgb + diffuse * materialUbo.diffuse.rgb * texture(texSampler, inTexCoord).rgb + specular * materialUbo.specular.rgb, 1.0) * lightColor * attenuation;
     }
     outColor = vec4(outColor.xyz, 1.0);
 }

@@ -18,6 +18,8 @@ namespace zvlk {
     struct CameraUBO {
         glm::mat4 view;
         glm::mat4 proj;
+        alignas(16) glm::vec3 eye;
+        alignas(16) glm::vec3 center;
     };
 
     class Camera : public UniformBuffer {
@@ -25,12 +27,13 @@ namespace zvlk {
         Camera() = delete;
         Camera(const Camera& orig) = delete;
         Camera(zvlk::Device* device, std::shared_ptr<zvlk::Frame> frame, glm::vec3 eye, glm::vec3 center = glm::vec3(0.0f, 0.0f, 0.0f), float fov = 45.0f,
-                glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f), float near = 0.1f, float far = 10.0f);
+                glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float near = 0.1f, float far = 10.0f);
         virtual ~Camera();
 
         virtual void* update(uint32_t index, float time);
         
-        void rotateEye(float angle, glm::vec3 axis=glm::vec3(0.0f, 0.0f, 1.0f));
+        Camera& rotateEye(float angle, glm::vec3 axis=glm::vec3(0.0f, 1.0f, 0.0f));
+        Camera& translateEye(glm::vec3 vector);
     private:
         glm::vec3 eye;
         glm::vec3 center;

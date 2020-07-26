@@ -24,12 +24,20 @@ namespace zvlk {
     void* Camera::update(uint32_t index, float time) {
         this->ubos[index].view = glm::lookAt(eye, center, up);
         this->ubos[index].proj = glm::perspective(fov, this->frame->getWidth() / (float) this->frame->getHeight(), near, far);
-        this->ubos[index].proj[1][1] *= -1;
+        this->ubos[index].eye = this->eye;
+        this->ubos[index].center = this->center;
 
         return &this->ubos[index];
     }
     
-    void Camera::rotateEye(float angle, glm::vec3 axis) {
+    Camera& Camera::rotateEye(float angle, glm::vec3 axis) {
         eye = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis) * glm::vec4(eye, 1.0f);
+        return *this;
     }
+    
+    Camera& Camera::translateEye(glm::vec3 vector) {
+        eye = glm::translate(glm::mat4(1.0f), vector) * glm::vec4(eye, 1.0f);
+        return *this;
+    }
+
 }

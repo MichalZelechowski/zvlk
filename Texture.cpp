@@ -131,7 +131,7 @@ namespace zvlk {
         this->device.free(this->imageMemory);
     }
 
-    vk::DescriptorImageInfo Texture::getDescriptorBufferInfo(uint32_t index) {
+    vk::DescriptorImageInfo Texture::getDescriptorImageInfo(uint32_t index) {
         vk::DescriptorImageInfo imageInfo{};
         imageInfo.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
         imageInfo.imageView = this->imageView;

@@ -83,6 +83,7 @@
             <linkerOptionItem>`pkg-config --libs glfw3`</linkerOptionItem>
             <linkerOptionItem>`pkg-config --libs libzip`</linkerOptionItem>
             <linkerOptionItem>`pkg-config --libs glm`</linkerOptionItem>
+            <linkerOptionItem>`pkg-config --libs cppunit`</linkerOptionItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>

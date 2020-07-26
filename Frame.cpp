@@ -160,9 +160,9 @@ namespace zvlk {
             swapChainFramebuffers[i] = this->graphicsDevice.createFramebuffer(framebufferInfo);
         }
 
-        this->clearValues = {vk::ClearValue(vk::ClearColorValue(std::array<float,4>({0.5f, 0.5f, 0.5f, 1.0f}))),
+        this->clearValues = {vk::ClearValue(vk::ClearColorValue(std::array<float,4>({0.0f, 0.0f, 0.0f, 1.0f}))),
             vk::ClearValue(vk::ClearDepthStencilValue(1.0f, 0)),
-            vk::ClearValue(vk::ClearColorValue(std::array<float,4>({1.0f, 0.0f, 0.0f, 1.0f})))};
+            vk::ClearValue(vk::ClearColorValue(std::array<float,4>({0.0f, 0.0f, 0.0f, 1.0f})))};
     }
 
     vk::SurfaceFormatKHR Frame::chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats) {

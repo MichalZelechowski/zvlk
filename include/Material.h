@@ -9,6 +9,7 @@
 #define MATERIAL_H
 
 #include "UniformBuffer.h"
+#include "Texture.h"
 #include <glm/vec4.hpp>
 #include <vector>
 
@@ -25,13 +26,16 @@ namespace zvlk {
     public:
         Material() = delete;
         Material(const Material& orig) = delete;
-        Material(zvlk::Device* device, std::shared_ptr<zvlk::Frame> frame, std::string name, glm::vec4 ambient, glm::vec4 diffuse, glm::vec4 specular, float shiness);
+        Material(zvlk::Device* device, std::shared_ptr<zvlk::Frame> frame, std::string name, glm::vec4 ambient, glm::vec4 diffuse, glm::vec4 specular, float shiness, std::string diffuseTextureName);
         virtual ~Material();
+        
+        vk::DescriptorImageInfo getDescriptorImageInfo(uint32_t index);
     protected:
         virtual void* update(uint32_t index, float time);
     private:
         std::vector<MaterialUBO> ubos;
         std::string name;
+        zvlk::Texture* diffuseTexture;
     };
 
 }

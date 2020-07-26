@@ -24,7 +24,7 @@ namespace zvlk {
         Texture(Device* device, std::string texturePath);
         virtual ~Texture();
 
-        vk::DescriptorImageInfo getDescriptorBufferInfo(uint32_t index);
+        vk::DescriptorImageInfo getDescriptorImageInfo(uint32_t index);
     private:
         vk::Device device;
         uint32_t mipLevels;

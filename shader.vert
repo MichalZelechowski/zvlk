@@ -4,6 +4,8 @@
 layout(set = 0, binding = 0) uniform CameraUbo {
     mat4 view;
     mat4 proj;
+    vec3 eye;
+    vec3 center;
 } cameraUbo;
 
 layout(set = 1, binding = 0) uniform TransformationUbo {

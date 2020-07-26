@@ -25,9 +25,7 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
-const char* MODEL_PATH = "/tmp/ldm12.obj";
-
-class TrainApplication : public zvlk::WindowCallback, zvlk::DeviceAssessment, zvlk::EngineCallback {
+class BallApplication : public zvlk::WindowCallback, zvlk::DeviceAssessment, zvlk::EngineCallback {
 public:
 
     void run() {
@@ -41,11 +39,12 @@ private:
     std::unique_ptr<zvlk::Vulkan> vulkan;
     std::shared_ptr<zvlk::Frame> frame;
     zvlk::Device *device;
-    zvlk::Texture *texture;
-    zvlk::Model* model;
+    zvlk::Model* room;
+    zvlk::Model* ball;
     zvlk::VertexShader *vertexShader;
     zvlk::FragmentShader *fragmentShader;
     zvlk::TransformationMatrices *transformationMatrices;
+    zvlk::TransformationMatrices *ballTransformationMatrices;
     zvlk::Engine* engine;
     zvlk::Camera* camera;
     std::set<int> lastKeys;
@@ -62,24 +61,24 @@ private:
         this->frame = this->vulkan->initializeDeviceForGraphics(this->device);
         this->frame->attachWindow(this->window);
 
-        this->texture = new zvlk::Texture(this->device, "viking_room.png");
-
-        this->model = new zvlk::Model(this->device, MODEL_PATH, this->frame);
+        this->room = new zvlk::Model(this->device, "/tmp/room.obj", this->frame);
+        this->ball = new zvlk::Model(this->device, "/tmp/ball.obj", this->frame);
 
         this->vertexShader = new zvlk::VertexShader(this->device->getGraphicsDevice(), "vert.spv");
         this->fragmentShader = new zvlk::FragmentShader(this->device->getGraphicsDevice(), "frag.spv");
 
-        this->camera = new zvlk::Camera(device, frame, glm::vec3(500.0f, 500.0f, 500.0f),
-                glm::vec3(0.0f, 0.0f, 0.0f), 45.0f, glm::vec3(0.0f, 0.0f, 1.0f), 0.1f, 2500.0f);
+        this->camera = new zvlk::Camera(device, frame, glm::vec3(10.0f, 10.0f, 10.0f),
+                glm::vec3(0.0f, 0.0f, 0.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 2500.0f);
         this->transformationMatrices = new zvlk::TransformationMatrices(this->device, this->frame);
-        this->transformationMatrices->rotate(90, glm::vec3(1.0f, 0.0f, 0.0f))
-                .translate(glm::vec3(0.0f, -250.0f, 0.0f));
+        this->transformationMatrices->scale(glm::vec3(10,10,10));
+        this->ballTransformationMatrices = new zvlk::TransformationMatrices(this->device, this->frame);
+        
         this->engine = new zvlk::Engine(this->frame, this->device);
         this->engine->setCamera(this->camera);
-        this->engine->attachLight(new zvlk::Light({1000.0f, 1000.0f, 1000.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, 0.000001f));
-        this->engine->attachLight(new zvlk::Light({-1000.0f, 1000.0f, 1000.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, 0.0f));
+        this->engine->attachLight(new zvlk::Light({10.0f, 10.0f, 10.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, 0.0f));
         this->engine->enableShaders(*this->vertexShader, *this->fragmentShader);
-        this->engine->draw(*this->model, *this->transformationMatrices, *this->texture);
+        this->engine->draw(*this->room, *this->transformationMatrices);
+        this->engine->draw(*this->ball, *this->ballTransformationMatrices);
         this->engine->compile();
 
         this->engine->addCallback(this);
@@ -119,16 +118,15 @@ private:
 
     void update(uint32_t frameIndex) {
         if (this->lastKeys.count(GLFW_KEY_A)) {
-            this->camera->rotateEye(1.0f);
-        } else if (this->lastKeys.count(GLFW_KEY_D)) {
             this->camera->rotateEye(-1.0f);
+        } else if (this->lastKeys.count(GLFW_KEY_D)) {
+            this->camera->rotateEye(1.0f);
         } else if (this->lastKeys.count(GLFW_KEY_W)) {
-            this->transformationMatrices->translate(glm::vec3(0.0f, -1.0f, 0.0f));
         } else if (this->lastKeys.count(GLFW_KEY_S)) {
-            this->transformationMatrices->translate(glm::vec3(0.0f, 1.0f, 0.0f));
         }
 
         static_cast<zvlk::UniformBuffer*> (this->transformationMatrices)->update(frameIndex);
+        static_cast<zvlk::UniformBuffer*> (this->ballTransformationMatrices)->update(frameIndex);
         static_cast<zvlk::UniformBuffer*> (this->camera)->update(frameIndex);
     }
 
@@ -183,9 +181,9 @@ private:
 
         delete this->camera;
         delete this->transformationMatrices;
-        delete this->model;
-
-        delete this->texture;
+        delete this->ballTransformationMatrices;
+        delete this->room;
+        delete this->ball;
     }
 
     void resize(int width, int height) {
@@ -236,9 +234,10 @@ int inflateModel(std::string source, std::string dest) {
 }
 
 int main() {
-    inflateModel("ldm12", "/tmp/");
+    inflateModel("ball", "/tmp/");
+    inflateModel("room", "/tmp/");
 
-    TrainApplication app;
+    BallApplication app;
 
     try {
         app.run();

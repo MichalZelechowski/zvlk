@@ -34,5 +34,10 @@ namespace zvlk {
         return *this;
     }
 
+    TransformationMatrices& TransformationMatrices::scale(glm::vec3 vector) {
+        this->current = glm::scale(glm::mat4(1.0f), vector)* this->current;
+        return *this;
+    }
+
 }
 

@@ -19,7 +19,7 @@ namespace zvlk {
             this->device.destroy(inFlightFences[i]);
         }
         this->clean();
-        
+
         delete this->lights;
     }
 
@@ -74,19 +74,19 @@ namespace zvlk {
             {}, nullptr});
     }
 
-    void Engine::draw(Model& model, TransformationMatrices& transformationMatrices, Texture& texture) {
+    void Engine::draw(Model& model, TransformationMatrices& transformationMatrices) {
         if (this->units.empty()) {
             throw std::runtime_error("drawing with no shaders enabled");
         }
 
         ExecutionUnit& unit = this->units.back();
-        unit.models.push_back({model, texture, transformationMatrices,
+        unit.models.push_back({model, transformationMatrices,
             {}});
     }
 
     void Engine::compile() {
         vk::PipelineInputAssemblyStateCreateInfo inputAssembly({}, vk::PrimitiveTopology::eTriangleList, VK_FALSE);
-        vk::Viewport viewport(0.0f, 0.0f, (float) frame->getWidth(), (float) frame->getHeight(), 0.0f, 1.0f);
+        vk::Viewport viewport(0.0f, (float) frame->getHeight(), (float) frame->getWidth(), -(float) frame->getHeight(), 0.0f, 1.0f);
         vk::Rect2D scissor(vk::Offset2D(0, 0), vk::Extent2D(frame->getWidth(), frame->getHeight()));
         vk::PipelineViewportStateCreateInfo viewportState({}, 1, &viewport, 1, &scissor);
         vk::PipelineRasterizationStateCreateInfo rasterizer({}, VK_FALSE, VK_FALSE, vk::PolygonMode::eFill,
@@ -186,27 +186,26 @@ namespace zvlk {
             this->device.updateDescriptorSets(descriptorWrites,{});
 
             for (ModelUnit& model : unit.models) {
-                uint32_t partsCount = model.model.getPartNames().size();
-                vk::DescriptorPoolSize samplerPoolSize(vk::DescriptorType::eCombinedImageSampler, this->frameNumber * partsCount);
-                vk::DescriptorPoolSize materialPoolSize(vk::DescriptorType::eUniformBuffer, this->frameNumber * partsCount);
+                uint32_t modelPartsCount = model.model.getMaterials().size();
+                vk::DescriptorPoolSize samplerPoolSize(vk::DescriptorType::eCombinedImageSampler, this->frameNumber * modelPartsCount);
+                vk::DescriptorPoolSize materialPoolSize(vk::DescriptorType::eUniformBuffer, this->frameNumber * modelPartsCount);
                 vk::DescriptorPoolSize modelPoolSizes[] = {samplerPoolSize, materialPoolSize};
-                vk::DescriptorPoolCreateInfo poolInfo({}, this->frameNumber * partsCount, 2, modelPoolSizes);
+                vk::DescriptorPoolCreateInfo poolInfo({}, this->frameNumber * modelPartsCount, 2, modelPoolSizes);
                 model.descriptorPool = this->device.createDescriptorPool(poolInfo);
 
-                std::vector<vk::DescriptorSetLayout> layouts(this->frameNumber * partsCount, this->materialLayout);
+                std::vector<vk::DescriptorSetLayout> layouts(this->frameNumber * modelPartsCount, this->materialLayout);
                 vk::DescriptorSetAllocateInfo allocInfo(model.descriptorPool, layouts.size(), layouts.data());
                 model.descriptorSets = this->device.allocateDescriptorSets(allocInfo);
 
                 std::vector<vk::WriteDescriptorSet> partWrites;
-                //so far there's one texture info per model, in the future there should be one texture info per part
-                std::vector<vk::DescriptorBufferInfo> materialInfos(this->frameNumber * partsCount);
-                std::vector<vk::DescriptorImageInfo> texturesInfos(this->frameNumber * partsCount);
+                std::vector<vk::DescriptorBufferInfo> materialInfos(this->frameNumber * modelPartsCount);
+                std::vector<vk::DescriptorImageInfo> texturesInfos(this->frameNumber * modelPartsCount);
                 for (size_t j = 0; j < this->frameNumber; j++) {
-                    for (uint32_t i = 0; i < partsCount; ++i) {
+                    for (uint32_t i = 0; i < modelPartsCount; ++i) {
                         uint32_t index = i * this->frameNumber + j;
-                        zvlk::Material* mat = model.model.getMaterial(i);
-                        materialInfos[index] = mat->getDescriptorBufferInfo(j);
-                        texturesInfos[index] = model.texture.getDescriptorBufferInfo(j);
+                        zvlk::Material* material = model.model.getMaterials()[i];
+                        materialInfos[index] = material->getDescriptorBufferInfo(j);
+                        texturesInfos[index] = material->getDescriptorImageInfo(j);
                         partWrites.push_back(
                                 vk::WriteDescriptorSet(model.descriptorSets[index], 0, 0, 1, vk::DescriptorType::eCombinedImageSampler, &texturesInfos[index],{},
                         {
@@ -236,17 +235,19 @@ namespace zvlk {
 
                 int j = 0;
                 for (ModelUnit& model : unit.models) {
-                    commandBuffers[i].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, this->pipelineLayout, 1, 1, &unit.descriptorSets[j * this->frameNumber + i], 0, nullptr);
-                    // if parts are sorted by material, this could be optimized and only some bindings done for this descriptor sets
-                    int k = 0;
-                    for (std::string& name : model.model.getPartNames()) {
-                        commandBuffers[i].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, this->pipelineLayout, 2, 1, &model.descriptorSets[k * this->frameNumber + i], 0, nullptr);
+                    vk::Buffer vertexBuffers[] = {model.model.getVertexBuffer()};
+                    vk::DeviceSize offsets[] = {0};
+                    commandBuffers[i].bindVertexBuffers(0, 1, vertexBuffers, offsets);
+                    commandBuffers[i].bindIndexBuffer(model.model.getIndexBuffer(), 0, vk::IndexType::eUint32);
 
-                        vk::Buffer vertexBuffers[] = {model.model.getVertexBuffer(name)};
-                        vk::DeviceSize offsets[] = {0};
-                        commandBuffers[i].bindVertexBuffers(0, 1, vertexBuffers, offsets);
-                        commandBuffers[i].bindIndexBuffer(model.model.getIndexBuffer(name), 0, vk::IndexType::eUint32);
-                        commandBuffers[i].drawIndexed(model.model.getNumberOfIndices(name), 1, 0, 0, 0);
+                    commandBuffers[i].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, this->pipelineLayout, 1, 1, &unit.descriptorSets[j * this->frameNumber + i], 0, nullptr);
+
+                    int k = 0;
+                    for (zvlk::Material* material : model.model.getMaterials()) {
+                        commandBuffers[i].bindDescriptorSets(vk::PipelineBindPoint::eGraphics, this->pipelineLayout, 2, 1, &model.descriptorSets[k * this->frameNumber + i], 0, nullptr);
+                        for (zvlk::ModelPart& modelPart : model.model.getModelParts(material)) {
+                            commandBuffers[i].drawIndexed(modelPart.numberOfIndices, 1, modelPart.indexOffset, 0, 0);
+                        }
                         k++;
                     }
                     j++;

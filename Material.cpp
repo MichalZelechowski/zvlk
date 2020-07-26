@@ -9,7 +9,7 @@
 
 namespace zvlk {
 
-    Material::Material(zvlk::Device* device, std::shared_ptr<zvlk::Frame> frame, std::string name, glm::vec4 ambient, glm::vec4 diffuse, glm::vec4 specular, float shiness) :
+    Material::Material(zvlk::Device* device, std::shared_ptr<zvlk::Frame> frame, std::string name, glm::vec4 ambient, glm::vec4 diffuse, glm::vec4 specular, float shiness, std::string diffuseTextureName) :
     UniformBuffer(device, sizeof (MaterialUBO), frame) {
         this->name = name;
         this->ubos.resize(frame->getImagesNumber());
@@ -20,6 +20,7 @@ namespace zvlk {
             this->ubos[i].shiness = shiness;
             dynamic_cast<UniformBuffer*>(this)->update(i);
         }
+        this->diffuseTexture = new Texture(device, diffuseTextureName);
     }
 
     void* Material::update(uint32_t index, float time) {
@@ -27,6 +28,10 @@ namespace zvlk {
     }
 
     Material::~Material() {
+        delete this->diffuseTexture;
     }
 
+    vk::DescriptorImageInfo Material::getDescriptorImageInfo(uint32_t index) {
+        return this->diffuseTexture->getDescriptorImageInfo(index);
+    }
 }

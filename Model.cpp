@@ -22,26 +22,27 @@ namespace zvlk {
             throw std::runtime_error(warn + err);
         }
 
-        std::unordered_map<std::string, std::unordered_map<Vertex, uint32_t >> uniqueVertices({});
+        std::unordered_map<Vertex, uint32_t> uniqueVertices({});
 
-        vk::DeviceSize vertexBufferSize = 0;
-        vk::DeviceSize indicesBufferSize = 0;
-        vk::DeviceSize maxStagingBufferSize = 0;
-        for(tinyobj::material_t& mat : materials) {
-            this->materials.push_back(new Material(device,frame, mat.name, 
-                    glm::vec4(mat.ambient[0],mat.ambient[1],mat.ambient[2],1.0f),
-                    glm::vec4(mat.diffuse[0],mat.diffuse[1],mat.diffuse[2],1.0f),
-                    glm::vec4(mat.specular[0],mat.specular[1],mat.specular[2],1.0f),
-                    mat.shininess));
+        for (tinyobj::material_t& mat : materials) {
+            zvlk::Material* newMaterial = new zvlk::Material(device, frame, mat.name,
+                    glm::vec4(mat.ambient[0], mat.ambient[1], mat.ambient[2], 1.0f),
+                    glm::vec4(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2], 1.0f),
+                    glm::vec4(mat.specular[0], mat.specular[1], mat.specular[2], 1.0f),
+                    mat.shininess, mat.diffuse_texname);
+            this->materials.push_back(newMaterial);
+            this->modelParts[newMaterial] = {};
         }
+
+        uint32_t lastIndexOffset = 0;
+        int indiceIndex = 0;
+        int lastMaterial = -1;
+        //TODO sorting by materials
         for (const auto& shape : shapes) {
-            uniqueVertices[shape.name] = std::unordered_map<Vertex, uint32_t>();
-            this->indices[shape.name] = std::vector<uint32_t>();
-            this->vertices[shape.name] = std::vector<Vertex>();
-            this->materialMapping[shape.name] = this->materials[shape.mesh.material_ids[0]];
-            this->names.push_back(shape.name);
-            
-            for (const auto& index : shape.mesh.indices) {
+            const tinyobj::mesh_t& mesh = shape.mesh;
+
+            int meshIndiceIndex=0;
+            for (const auto& index : mesh.indices) {
                 Vertex vertex{};
 
                 vertex.position = {
@@ -60,82 +61,63 @@ namespace zvlk {
                     attrib.normals[3 * index.normal_index + 1],
                     attrib.normals[3 * index.normal_index + 2]
                 };
-
-                if (uniqueVertices[shape.name].count(vertex) == 0) {
-                    uniqueVertices[shape.name][vertex] = static_cast<uint32_t> (this->vertices[shape.name].size());
-                    this->vertices[shape.name].push_back(vertex);
+                
+                if (uniqueVertices.count(vertex) == 0) {
+                    uniqueVertices[vertex] = static_cast<uint32_t> (this->vertices.size());
+                    this->vertices.push_back(vertex);
                 }
 
-                this->indices[shape.name].push_back(uniqueVertices[shape.name][vertex]);
+                if (lastMaterial == -1) {
+                    lastMaterial = mesh.material_ids[meshIndiceIndex/3];
+                } else if (lastMaterial != mesh.material_ids[meshIndiceIndex/3]) {
+                    this->modelParts[this->materials[lastMaterial]].push_back({indiceIndex - lastIndexOffset, lastIndexOffset});
+
+                    lastMaterial = mesh.material_ids[meshIndiceIndex/3];
+                    lastIndexOffset = indiceIndex;
+                }
+
+                this->indices.push_back(uniqueVertices[vertex]);
+                indiceIndex++;
+                meshIndiceIndex++;
             }
 
-            vertexBufferSize += sizeof (this->vertices[shape.name][0]) * this->vertices[shape.name].size();
-            indicesBufferSize += sizeof (this->indices[shape.name][0]) * this->indices[shape.name].size();
-            maxStagingBufferSize = std::max(std::max(maxStagingBufferSize, sizeof (this->vertices[shape.name][0]) * this->vertices[shape.name].size()),
-                    sizeof (this->indices[shape.name][0]) * this->indices[shape.name].size());
         }
+        this->modelParts[this->materials[lastMaterial]].push_back({indiceIndex - lastIndexOffset, lastIndexOffset});
 
-        vk::MemoryAllocateInfo vertexAllocationInfo(0, 0);
-        vk::MemoryAllocateInfo indexAllocationInfo(0, 0);
-        for (auto& shape : shapes) {
-            this->vertexBuffer[shape.name] = vk::Buffer();
-            this->indexBuffer[shape.name] = vk::Buffer();
+        vk::DeviceSize vertexBufferSize = sizeof (this->vertices[0]) * this->vertices.size();
+        vk::DeviceSize indicesBufferSize = sizeof (this->indices[0]) * this->indices.size();
+        vk::DeviceSize maxStagingBufferSize = std::max(vertexBufferSize, indicesBufferSize);
 
-            vk::DeviceSize bufferSize = sizeof (this->vertices[shape.name][0]) * this->vertices[shape.name].size();
-            device->createVertexBuffer(bufferSize, this->vertexBuffer[shape.name]);
-            bufferSize = sizeof (this->indices[shape.name][0]) * this->indices[shape.name].size();
-            device->createIndexBuffer(bufferSize, this->indexBuffer[shape.name]);
-
-            vk::MemoryAllocateInfo ma = device->getMemoryAllocateInfo(this->vertexBuffer[shape.name], vk::MemoryPropertyFlagBits::eDeviceLocal);
-            vertexAllocationInfo.allocationSize += ma.allocationSize;
-            vertexAllocationInfo.memoryTypeIndex = ma.memoryTypeIndex;
-            ma = device->getMemoryAllocateInfo(this->indexBuffer[shape.name], vk::MemoryPropertyFlagBits::eDeviceLocal);
-            indexAllocationInfo.allocationSize += ma.allocationSize;
-            indexAllocationInfo.memoryTypeIndex = ma.memoryTypeIndex;
-        }
+        device->createVertexBuffer(vertexBufferSize, this->vertexBuffer);
+        device->createIndexBuffer(indicesBufferSize, this->indexBuffer);
 
         vk::Buffer stagingBuffer;
         vk::DeviceMemory stagingBufferMemory;
         device->createStagingBuffer(maxStagingBufferSize, stagingBuffer, stagingBufferMemory);
 
-            device->createDeviceMemory(vertexAllocationInfo, this->vertexBufferMemory);
+        vk::MemoryAllocateInfo vertexAllocationInfo = device->getMemoryAllocateInfo(this->vertexBuffer, vk::MemoryPropertyFlagBits::eDeviceLocal);
+        vk::MemoryAllocateInfo indexAllocationInfo = device->getMemoryAllocateInfo(this->indexBuffer, vk::MemoryPropertyFlagBits::eDeviceLocal);
+        device->createDeviceMemory(vertexAllocationInfo, this->vertexBufferMemory);
         device->createDeviceMemory(indexAllocationInfo, this->indexBufferMemory);
 
-        vk::DeviceSize vertexOffset = 0;
-        vk::DeviceSize indicesOffset = 0;
-        for (auto& shape : shapes) {
-            vk::DeviceSize bufferSize = sizeof (this->vertices[shape.name][0]) * this->vertices[shape.name].size();
-            vk::MemoryAllocateInfo ma = device->getMemoryAllocateInfo(this->vertexBuffer[shape.name], vk::MemoryPropertyFlagBits::eDeviceLocal);
-            device->copyMemory(bufferSize, vertices[shape.name].data(), stagingBufferMemory);
-            device->bindBuffer(vertexBuffer[shape.name], this->vertexBufferMemory, vertexOffset);
-            device->copyBuffer(stagingBuffer, vertexBuffer[shape.name], bufferSize);
-            vertexOffset += ma.allocationSize;
+        device->copyMemory(vertexBufferSize, vertices.data(), stagingBufferMemory);
+        device->bindBuffer(vertexBuffer, this->vertexBufferMemory, static_cast<vk::DeviceSize> (0));
+        device->copyBuffer(stagingBuffer, vertexBuffer, vertexBufferSize);
 
-            bufferSize = sizeof (this->indices[shape.name][0]) * this->indices[shape.name].size();
-            ma = device->getMemoryAllocateInfo(this->indexBuffer[shape.name], vk::MemoryPropertyFlagBits::eDeviceLocal);
-            device->copyMemory(bufferSize, indices[shape.name].data(), stagingBufferMemory);
-            device->bindBuffer(indexBuffer[shape.name], this->indexBufferMemory, indicesOffset);
-            device->copyBuffer(stagingBuffer, indexBuffer[shape.name], bufferSize);
-            indicesOffset += ma.allocationSize;
-        }
+        device->copyMemory(indicesBufferSize, indices.data(), stagingBufferMemory);
+        device->bindBuffer(indexBuffer, this->indexBufferMemory, static_cast<vk::DeviceSize> (0));
+        device->copyBuffer(stagingBuffer, indexBuffer, indicesBufferSize);
 
         device->freeMemory(stagingBuffer, stagingBufferMemory);
         this->device = device;
     }
 
     Model::~Model() {
-        std::vector<std::string> names = this->getPartNames();
-        std::vector<vk::Buffer> iB= {};
-        std::vector<vk::Buffer> vB= {};
-        for (auto& name : names) {
-            iB.push_back(this->indexBuffer[name]);
-            vB.push_back(this->vertexBuffer[name]);
-        }
-        for (auto material: materials) {
+        for (auto material : materials) {
             delete material;
         }
-        this->device->freeMemory(iB, this->indexBufferMemory);
-        this->device->freeMemory(vB, this->vertexBufferMemory);
+        this->device->freeMemory(this->indexBuffer, this->indexBufferMemory);
+        this->device->freeMemory(this->vertexBuffer, this->vertexBufferMemory);
     }
 }
 

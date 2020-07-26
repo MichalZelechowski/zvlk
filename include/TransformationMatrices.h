@@ -32,6 +32,7 @@ namespace zvlk {
         
         TransformationMatrices& rotate(float angleDegrees, glm::vec3 direction);
         TransformationMatrices& translate(glm::vec3 vector);
+        TransformationMatrices& scale(glm::vec3 vector);
     protected:
         void* update(uint32_t index, float time);
     private:
