@@ -50,6 +50,8 @@ private:
     std::set<int> lastKeys;
 
     bool framebufferResized = false;
+    float ballFallingSpeed = 0.0f;
+    float ballDistance = 0.0f;
 
     void init() {
         this->window = std::shared_ptr<zvlk::Window>(new zvlk::Window(800, 600, std::string("Vulkan"), dynamic_cast<WindowCallback*> (this)));
@@ -70,12 +72,15 @@ private:
         this->camera = new zvlk::Camera(device, frame, glm::vec3(10.0f, 10.0f, 10.0f),
                 glm::vec3(0.0f, 0.0f, 0.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 2500.0f);
         this->transformationMatrices = new zvlk::TransformationMatrices(this->device, this->frame);
-        this->transformationMatrices->scale(glm::vec3(10,10,10));
+        this->transformationMatrices->scale(glm::vec3(10, 10, 10));
         this->ballTransformationMatrices = new zvlk::TransformationMatrices(this->device, this->frame);
-        
+
         this->engine = new zvlk::Engine(this->frame, this->device);
         this->engine->setCamera(this->camera);
-        this->engine->attachLight(new zvlk::Light({10.0f, 10.0f, 10.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, 0.0f));
+        this->engine->attachLight(new zvlk::Light({10.0f, 10.0f, 10.0f},
+        {
+            1.0f, 1.0f, 1.0f, 1.0f
+        }, 0.0f));
         this->engine->enableShaders(*this->vertexShader, *this->fragmentShader);
         this->engine->draw(*this->room, *this->transformationMatrices);
         this->engine->draw(*this->ball, *this->ballTransformationMatrices);
@@ -124,6 +129,26 @@ private:
         } else if (this->lastKeys.count(GLFW_KEY_W)) {
         } else if (this->lastKeys.count(GLFW_KEY_S)) {
         }
+
+        static auto startTime = std::chrono::high_resolution_clock::now();
+
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+        if (ballDistance <= 9.0f) {
+            ballFallingSpeed += 9.81f * time;
+            float ballDistanceDelta = 100 * 0.5f * ballFallingSpeed * time;
+            ballDistance += ballDistanceDelta;
+            if (ballDistance > 9.0f) {
+                ballDistanceDelta -= ballDistance - 9.0f;
+                ballDistance = 9.0f;
+                ballFallingSpeed *= -1*0.95f;
+            }
+            this->ballTransformationMatrices->translate(glm::vec3(0.0f, -ballDistanceDelta, 0.0f));
+        }
+
+
+        startTime = currentTime;
 
         static_cast<zvlk::UniformBuffer*> (this->transformationMatrices)->update(frameIndex);
         static_cast<zvlk::UniformBuffer*> (this->ballTransformationMatrices)->update(frameIndex);
